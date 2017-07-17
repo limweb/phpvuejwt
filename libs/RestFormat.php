@@ -30,10 +30,10 @@ namespace Jacwright\RestServer;
  */
 class RestFormat
 {
-	const PLAIN = 'text/plain';
-	const HTML  = 'text/html';
-	const JSON  = 'application/json';
-	const XML   = 'application/xml';
+	const PLAIN = 'text/plain; charset=utf-8';
+	const HTML  = 'text/html; charset=utf-8';
+	const JSON  = 'application/json; charset=utf-8';
+	const XML   = 'application/xml; charset=utf-8';
 
     /** @var array */
 	static public $formats = array(

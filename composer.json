@@ -1,6 +1,7 @@
 {
     "require": {
         "symfony/var-dumper": "^3.3",
-        "lcobucci/jwt": "^3.2"
+        "lcobucci/jwt": "^3.2",
+        "illuminate/database": "^5.4"
     }
 }
