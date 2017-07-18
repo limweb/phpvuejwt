@@ -1,8 +1,9 @@
 <?php
 use \Jacwright\RestServer\RestException;
 use Illuminate\Database\Capsule\Manager as Capsule; 
+use \Jacwright\RestServer\RestController as BaseController;
 
-class QuestionController {
+class QuestionController extends BaseController {
 
 
     public function getJson($id = null,$a=null,$b=null,$c=null) {

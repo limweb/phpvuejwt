@@ -1,9 +1,9 @@
 <?php
 
 use \Jacwright\RestServer\RestException;
+use \Jacwright\RestServer\RestController as BaseController;
 
-class AaaController
-{
+class AaaController extends BaseController {
     /**
      * Returns a JSON string object to the browser when hitting the root of the domain
      *

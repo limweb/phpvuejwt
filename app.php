@@ -47,6 +47,7 @@ if (!function_exists( 'implodeKV' ) && ! function_exists('consolelog') ) {
     } else {
       $ruri = '/console';
     }
+    
     file_put_contents("php://stdout",
       sprintf("[%s] %s:%s [%s]:%s \n",
         date("D M j H:i:s Y"),
@@ -66,14 +67,8 @@ if (!function_exists('logAccess')) {
     }
 }
 //------------- INIT----------------------------------------
-// require_once __DIR__.'/English.php';
-
-require __DIR__.'/controllers/TestController.php';
-require __DIR__.'/controllers/AuthController.php';
-require __DIR__.'/controllers/QuestionController.php';
-
-$server = new \Jacwright\RestServer\RestServer('debug');
-$server->addClass('TestController');
+$server = new \Jacwright\RestServer\RestServer('debug'); // mode = debug / production
+$server->addClass('SysController');
 $server->addClass('AuthController','/api/v1/auth');
-$server->addClass('QuestionController','/api/v1/q');
+include __DIR__.'/route/routes.php';
 $server->handle();

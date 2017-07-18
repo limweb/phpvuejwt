@@ -23,10 +23,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace Jacwright\RestServer; {}
+namespace Jacwright\RestServer;
 
 require(__DIR__ . '/RestFormat.php');
 require(__DIR__ . '/RestException.php');
+require(__DIR__ . '/RestController.php');
 
 use Exception;
 use ReflectionClass;
@@ -122,6 +123,7 @@ class RestServer
 	public $jsonAssoc = false;
 	public $token = null;
   	public $exptime = 3600;  //  60sec * 60 mins
+  	// public $exptime = 60;  //  60sec * 60 mins
     public $secretKey = '02443f12-e1ef-11e5-b86d-9a79f06e9478';
     public $jwtobj = '';
     public $signer;
@@ -129,7 +131,6 @@ class RestServer
 	protected $errorClasses = array();
 	protected $cached;
 
-	protected $httpmethods = ['get','post','put','patch','delete','head','options'];
 	protected $userole = true;
 	protected $actions = ['r','c','u','d','p','e','a','t'];  //action  read create update delete print export auth etc
 	protected $modules = ['a','b','c']; // module
@@ -171,6 +172,10 @@ class RestServer
 		$o->actions = $this->actions;
 		$o->modules = $this->modules;
 		return $o;
+	}
+
+	public function routes(){
+		return $this->map;
 	}
 
 	public function chk($module=null,$action=null){
@@ -284,30 +289,31 @@ class RestServer
 		$this->jsonAssoc = ($value === true);
 	}
 
-	public function addClass($class, $basePath = '')
-	{
-		$this->loadCache();
+	public function addClass($class, $basePath = '') {
+		$filepath = __DIR__.'/../controllers/'.$class.'.php';
+		if (file_exists($filepath)) {
+			require_once($filepath);
+			$this->loadCache();
+			if (!$this->cached) {
+				if (is_string($class) && !class_exists($class)){
+					throw new Exception('Invalid method or class');
+				} elseif (!is_string($class) && !is_object($class)) {
+					throw new Exception('Invalid method or class; must be a classname or object');
+				}
 
-		if (!$this->cached) {
-			if (is_string($class) && !class_exists($class)){
-				throw new Exception('Invalid method or class');
-			} elseif (!is_string($class) && !is_object($class)) {
-				throw new Exception('Invalid method or class; must be a classname or object');
-			}
+				if (substr($basePath, 0, 1) == '/') {
+					$basePath = substr($basePath, 1);
+				}
+				if ($basePath && substr($basePath, -1) != '/') {
+					$basePath .= '/';
+				}
 
-			if (substr($basePath, 0, 1) == '/') {
-				$basePath = substr($basePath, 1);
+				$this->generateMap($class, $basePath);
 			}
-			if ($basePath && substr($basePath, -1) != '/') {
-				$basePath .= '/';
-			}
-
-			$this->generateMap($class, $basePath);
 		}
 	}
 
-	public function addErrorClass($class)
-	{
+	public function addErrorClass($class)	{
 		$this->errorClasses[] = $class;
 	}
 
@@ -588,27 +594,31 @@ class RestServer
 		$this->token  = $this->getBearerToken();
 		$token = $this->token;
 		$o = new \stdClass();
+		$o->status = false;
+		$o->verify = false;
 		$o->token = $token;
 		$o->method = __FUNCTION__;
 		$host = $this->server['HTTP_HOST'];
 		if($token){
 		    $token = (new Parser())->parse($token);
-			$o->header = $token->getHeaders(); // Retrieves the token header
-			$o->claims = $token->getClaims(); // Retrieves the token claims
-			$o->jti = $token->getHeader('jti'); // will print "4f1g23a12aa"
-			$o->iss = $token->getClaim('iss'); // will print "http://example.com"
-			$o->uid = $token->getClaim('uid'); // will print "1"
-			$o->username = $token->getClaim('username'); // will print "1"
-			$o->role = $token->getClaim('role'); // will print "1" admin user superuser
-			$o->level = $token->getClaim('level'); // will print "1" FFFFFFFFFFFFFFFFFF
-		    $validationData = new ValidationData();
-		    $validationData->setIssuer($host);
-		    $validationData->setAudience($host);
-		    $o->validate = $token->validate($validationData);
-		    $o->host = $host;
-		    $o->status = $o->validate;
-		} else {
-			$o->status = false;
+		    $o->verify = $token->verify($this->signer, $this->secretKey);
+			if($o->verify) {
+				$o->header = $token->getHeaders(); // Retrieves the token header
+				$o->claims = $token->getClaims(); // Retrieves the token claims
+				$o->jti = $token->getHeader('jti'); // will print "4f1g23a12aa"
+				$o->iss = $token->getClaim('iss'); // will print "http://example.com"
+				$o->uid = $token->getClaim('uid'); // will print "1"
+				$o->username = $token->getClaim('username'); // will print "1"
+				$o->role = $token->getClaim('role'); // will print "1" admin user superuser
+				$o->level = $token->getClaim('level'); // will print "1" FFFFFFFFFFFFFFFFFF
+			    
+			    $validationData = new ValidationData();
+			    $validationData->setIssuer($host);
+			    $validationData->setAudience($host);
+			    $o->validate = $token->validate($validationData);
+			    $o->host = $host;
+			    $o->status = $o->validate;
+			}
 		}
 		$this->jwtobj = $o;
 	}
@@ -621,6 +631,17 @@ class RestServer
 
 		return $data;
 	}
+
+
+   public function tokenverify()   {
+        if ($this->token) {
+        	$token = (new Parser())->parse($this->token);
+            return $token->verify($this->signer, $this->secretKey);
+        } else {
+            return false;
+        }
+    }
+
 
 
 	public function sendData($data){
@@ -726,8 +747,6 @@ class RestServer
 	}
 
 
-	
-
 	/** 
 	 * Get hearder Authorization
 	 * */
@@ -801,4 +820,6 @@ class RestServer
 		'501' => 'Not Implemented',
 		'503' => 'Service Unavailable'
 	);
+	private $httpmethods = ['get','post','put','patch','delete','head','options'];
 }
+

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<status>TRUE</status>
+<br/>
+<div>02443f12-e1ef-11e5-b86d-9a79f06e9478</div>
+<div>www.shopsthai.com</div>
+<div>www.abc.com</div>
+<div>127.0.0.1</div>
+<div>localhost</div>
+</body>
+</html>
