@@ -6,45 +6,70 @@ use \Jacwright\RestServer\RestController as BaseController;
 
 class SysController extends BaseController {
     
+    /**
+     * @noAuth
+     */
     public function getTest($id = null,$a=null,$b=null,$c=null) {
         $o = new stdClass();
-        $o->url = $this->server->url;
-        $o->method = $this->server->method;
-        $o->params = $this->server->params;
-        $o->tokenverify = $this->server->tokenverify();
+        // dump($this->rbac);
+        $o->hasRole = $this->rbac->hasRole('admin');
+        $o->rbac = $this->rbac;
+        $o->this = $this;
+        // $o->url = $this->server->url;
+        // $o->method = $this->server->method;
+        // $o->params = $this->server->params;
+        // $o->token = $this->jwt->getToken();
+        // $o->tokenverify = $this->jwt->tokenverify();
+        // $o->chkauto = $this->jwt->chkauth();
         $o->data = 'tlen work';
-        $o->format = $this->server->format;
-        $o->jwt = $this->server->jwtobj;
-        $o->role = $this->server->chk('a','t');
-        $o->testdata = $this->server->testdata();
-        if($o->jwt->status && $this->server->chk('a','t')){
-            $o->status = 'success';
-        } else{
-            $o->status = 'unsuccess';
-        }
+        // $o->format = $this->server->format;
+        $o->status = 'success';
         return $o;
     }
 
-
+    /**
+     * @noAuth
+     */
     private function  info($info=null){
         echo "<br/><center><b>API Server JWT v1.".((isset($info) && $info=='tlen') ? $info : null)." is WORK!</b></cener>";
     }
 
+    /**
+     * @noAuth
+     */
     public function getRoutes($info=null) {
         $this->info($info);
         if($this->server->mode == 'debug' || $info == 'tlen') {
             echo '<table><thead><tr><td><b>Route</b></td><td><b>Controller</b></td><td><b>Method</b></td><td><b>$args</b></td><td>null</td><td><b>$noAuth</b></td></tr></thead><tbody>';
             foreach ($this->server->routes() as $routekey => $routes) {
                 echo '<tr><td colspan="6">--------------------------> '.$routekey.'-------------------------------------------------------------------------------</td></tr>';
-                foreach ($routes as $key => $value) {
-                    echo "<tr><td>$key</td><td>$value[0]</td><td>$value[1]</td><td><pre>".json_encode($value[2])."</pre></td><td>".json_encode($value[3])."</td><td>".json_encode($value[4])."</td></tr>";
+
+                switch ($routekey) {
+                    case 'GET':
+                        foreach ($routes as $key => $value) {
+                            echo "<tr><td>".($routekey =='GET' ? '<a href="http://'.$_SERVER['HTTP_HOST'].'/'.$key.'">'.( empty($key) ? '/' : $key ).'</a>'    : $key)."</td><td>$value[0]</td><td>$value[1]</td><td><pre>".json_encode($value[2])."</pre></td><td>".json_encode($value[3])."</td><td>".json_encode($value[4])."</td></tr>";
+                        }
+                        break;
+                    case 'POST':
+                    case 'OPTIONS':
+                    default:
+                        foreach ($routes as $key => $value) {
+                            echo "<tr><td style='cursor:pointer;' onclick='alert(\"".$key."\")'>$key</td><td>$value[0]</td><td>$value[1]</td><td><pre>".json_encode($value[2])."</pre></td><td>".json_encode($value[3])."</td><td>".json_encode($value[4])."</td></tr>";
+                        }
+                        break;
                 }
+
+
             }
             echo '</tbody></table>';
         }
         exit(0);
     }
 
+
+    /**
+     * @noAuth
+     */
     public function getServerinfo($info=null,$show=null) {
         $this->info($info);
         if($this->server->mode == 'debug' || $info == 'tlen'){
@@ -57,24 +82,32 @@ class SysController extends BaseController {
         exit(0);
     }
 
-
     /**
-     * Returns a JSON string object to the browser when hitting the root of the domain
-     *
-     * @url GET /
+     * @url GET /info
      * @noAuth
      */
-    public function test()
-    {
-
-        echo "<br/><center><b>API Server JWT v1. is WORK!</b></cener>";
+    public function homeinfo($info=null)   {
+        $this->info($info);
         require __DIR__.'/../home/magic.html';
         exit(0);
     }
 
     /**
+     * @url GET /
+     * @noAuth
+     */
+    public function test()
+    {
+        // $this->info();
+        // require __DIR__.'/../home/magic.html';
+        // require __DIR__.'/../page/app.php';
+        require __DIR__.'/../index.html';
+        exit(0);
+    }
+
+    /**
      * Throws an error
-     * 
+     * @noAuth
      * @url GET /error
      */
     public function throwError() {

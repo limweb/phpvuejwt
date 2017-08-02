@@ -27,6 +27,8 @@ namespace Jacwright\RestServer;
 
 require(__DIR__ . '/RestFormat.php');
 require(__DIR__ . '/RestException.php');
+require(__DIR__ . '/RestJwt.php');
+require(__DIR__ . '/RestRbac.php');
 require(__DIR__ . '/RestController.php');
 
 use Exception;
@@ -34,9 +36,6 @@ use ReflectionClass;
 use ReflectionObject;
 use ReflectionMethod;
 use DOMDocument;
-use Lcobucci\JWT\Signer\Hmac\Sha256;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\ValidationData;
 
 //------------- INIT----------------------------------------
 if (!function_exists( 'implodeKV' ) && ! function_exists('consolelog') ) {
@@ -101,8 +100,6 @@ if (!function_exists('logAccess')) {
 }
 //------------- INIT----------------------------------------
 
-
-
 /**
  * Description of RestServer
  *
@@ -121,19 +118,10 @@ class RestServer
 	public $root;
 	public $rootPath;
 	public $jsonAssoc = false;
-	public $token = null;
-  	public $exptime = 3600;  //  60sec * 60 mins
-  	// public $exptime = 60;  //  60sec * 60 mins
-    public $secretKey = '02443f12-e1ef-11e5-b86d-9a79f06e9478';
-    public $jwtobj = '';
-    public $signer;
 	protected $map = array();
 	protected $errorClasses = array();
 	protected $cached;
-
-	protected $userole = true;
-	protected $actions = ['r','c','u','d','p','e','a','t'];  //action  read create update delete print export auth etc
-	protected $modules = ['a','b','c']; // module
+	private $_token = null ;  // string payload  header.payload.sinager
 
 	/**
 	 * The constructor.
@@ -141,6 +129,7 @@ class RestServer
 	 * @param string $mode The mode, either debug or production
 	 */
 	public function  __construct($mode = 'debug', $realm = 'Rest Server'){
+		($mode != 'production' ? $mode = 'debug' : null );
 		$this->mode = $mode;
 		$this->realm = $realm;
 		// Set the root
@@ -154,7 +143,7 @@ class RestServer
 		}
 		$this->server = $_SERVER;
 		$this->root = $dir;
-		$this->signer = new Sha256();
+		$this->token = null;
 	}
 
 	public function  __destruct()	{
@@ -167,64 +156,36 @@ class RestServer
 		}
 	}
 
-	public function testdata(){
-		$o = new \stdClass();
-		$o->actions = $this->actions;
-		$o->modules = $this->modules;
-		return $o;
-	}
-
 	public function routes(){
 		return $this->map;
 	}
 
-	public function chk($module=null,$action=null){
-		$chk = 1;
-		if($this->userole) {
-			if(empty($this->jwtobj)) return false;
-			if(isset($this->jwtobj) && $this->jwtobj->status) {
-				$str = $this->jwtobj->level;
-				$ls = explode(':',chunk_split($str,2,':'));
-				$m = array_search($module,$this->modules); 
-				(is_numeric($m) ? null : $chk = 0 );
-				$levelhx = $ls[$m];
-				($levelhx ? null : $chk=0 );
-				if($chk){
-					$level = base_convert($levelhx,16,2);
-					$a = array_search($action,$this->actions);
-					(is_numeric($a) ? null : $chk = 0 );
-				}
-				return ($chk ? $level[$a] : 0 );	
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
+	public function setToken($token=null) {
+		if($token) $this->_token = $token;
+	}	
+	public function getToken() {
+		return  $this->_token;
 	}
 
-	public function refreshCache()
-	{
+	public function refreshCache() 	{
 		$this->map = array();
 		$this->cached = false;
 	}
 
-	public function unauthorized($ask = false)
-	{
+	public function unauthorized($ask = false) 	{
 		if ($ask) {
 			header("WWW-Authenticate: Basic realm=\"$this->realm\"");
 		}
 		throw new RestException(401, "You are not authorized to access this resource.");
 	}
 
-	public function options()
-	{
-		// throw new RestException(200, "authorized");
-		return ['status'=>'success'];
+	public function options() 	{
+		if(CROS){
+			return ['status'=>'success'];
+		}  throw new RestException(200, "authorized");
 	}
 
-	public function handle()
-	{
+	public function handle() {
 		$this->url = $this->getPath();
 		$this->method = $this->getMethod();
 		$this->format = $this->getFormat();
@@ -232,17 +193,12 @@ class RestServer
 			$this->data = $this->getData();
 		}
 
-		$this->jwt();
-		consolelog('this->token--->',$this->token);
 		//preflight requests response 
-		if($this->method == 'OPTIONS' && getallheaders()['Access-Control-Request-Headers']){
+		if($this->method == 'OPTIONS' && isset(getallheaders()['Access-Control-Request-Headers'])){
 			$this->sendData($this->options());
 		} 
 
-		if ($this->method == "OPTIONS") {
- 		   $this->sendData([ 'statue'=>'success','method'=> $this->method]);
-		}
-
+		
 		list($obj, $method, $params, $this->params, $noAuth) = $this->findUrl();
 		if ($obj) {
 			if (is_string($obj)) {
@@ -284,8 +240,7 @@ class RestServer
 	{
 		$this->rootPath = '/'.trim($path, '/').'/';
 	}
-	public function setJsonAssoc($value)
-	{
+	public function setJsonAssoc($value) {
 		$this->jsonAssoc = ($value === true);
 	}
 
@@ -317,8 +272,7 @@ class RestServer
 		$this->errorClasses[] = $class;
 	}
 
-	public function handleError($statusCode, $errorMessage = null)
-	{
+	public function handleError($statusCode, $errorMessage = null)	{
 		$method = "handle$statusCode";
 		foreach ($this->errorClasses as $class) {
 			if (is_object($class)) {
@@ -347,8 +301,7 @@ class RestServer
 		$this->sendData(array('error' => array('code' => $statusCode, 'message' => $errorMessage)));
 	}
 
-	protected function loadCache()
-	{
+	protected function loadCache()	{
 		if ($this->cached !== null) {
 			return;
 		}
@@ -374,8 +327,7 @@ class RestServer
 		}
 	}
 
-	protected function findUrl()
-	{
+	protected function findUrl() {
 		$urls = $this->map[$this->method];
 		if (!$urls) return null;
 		foreach ($urls as $url => $call) {
@@ -431,8 +383,7 @@ class RestServer
 		}
 	}
 
-	protected function generateMap($class, $basePath)
-	{
+	protected function generateMap($class, $basePath)	{
 		if (is_object($class)) {
 			$reflection = new ReflectionObject($class);
 		} elseif (class_exists($class)) {
@@ -441,90 +392,91 @@ class RestServer
 
 		$methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);    //@todo $reflection might not be instantiated
 		foreach ($methods as $method) {
-			$doc = $method->getDocComment();
-			$noAuth = strpos($doc, '@noAuth') !== false;
-			
-			$params = $method->getParameters();
-			if (preg_match_all('/@url[ \t]+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)[ \t]+\/?(\S*)/s', $doc, $matches, PREG_SET_ORDER)) {
-				foreach ($matches as $match) {
-					$httpMethod = $match[1];
-					$url = $basePath . $match[2];
-					if ($url && $url[strlen($url) - 1] == '/') {
-						$url = substr($url, 0, -1);
-					}
-					$call = array($class, $method->getName());
-					$args = array();
-					foreach ($params as $param) {
-						$args[$param->getName()] = $param->getPosition();
-					}
-					$call[] = $args;
-					$call[] = null;
-					$call[] = $noAuth;
+			if(!in_array($method->name,['init','__construct','authorize','__call'])) {
+				$doc = $method->getDocComment();
+				$noAuth = strpos($doc, '@noAuth') !== false;
+				
+				$params = $method->getParameters();
+				if (preg_match_all('/@url[ \t]+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)[ \t]+\/?(\S*)/s', $doc, $matches, PREG_SET_ORDER)) {
+					foreach ($matches as $match) {
+						$httpMethod = $match[1];
+						$url = $basePath . $match[2];
+						if ($url && $url[strlen($url) - 1] == '/') {
+							$url = substr($url, 0, -1);
+						}
+						$call = array($class, $method->getName());
+						$args = array();
+						foreach ($params as $param) {
+							$args[$param->getName()] = $param->getPosition();
+						}
+						$call[] = $args;
+						$call[] = null;
+						$call[] = $noAuth;
 
-					$this->map[$httpMethod][$url] = $call;
-				}
-			} else  {
-				$chk = 1;
-				foreach ($this->httpmethods as $httpMethod ) {
-					$match = preg_split('@(?=[A-Z])@', $method->getName());
-					if( $match[0]== $httpMethod ){
-							$chk = 0;
-							$url = strtolower($basePath.$match[1]);
-							if ($url && $url[strlen($url) - 1] == '/') {
-								$url = substr($url, 0, -1);
-							}
-							
-							$args = array();
-							foreach ($params as $param) {
-								$args[$param->getName()] = $param->getPosition();
-							}
+						$this->map[$httpMethod][$url] = $call;
+					}
+				} else  {
+					$chk = 1;
+					foreach ($this->httpmethods as $httpMethod ) {
+						$match = preg_split('@(?=[A-Z])@', $method->getName());
+						if( $match[0]== $httpMethod ){
+								$chk = 0;
+								$url = strtolower($basePath.$match[1]);
+								if ($url && $url[strlen($url) - 1] == '/') {
+									$url = substr($url, 0, -1);
+								}
+								
+								$args = array();
+								foreach ($params as $param) {
+									$args[$param->getName()] = $param->getPosition();
+								}
 
-							$call = array($class, $method->getName());
-							$call[] = $args;
-							$call[] = null;
-							$call[] = $noAuth;
-							$this->map[strtoupper($httpMethod)][$url] = $call;
-							foreach ($args as $key => $value) {
 								$call = array($class, $method->getName());
-								$url .= '/$'.$key;
 								$call[] = $args;
 								$call[] = null;
 								$call[] = $noAuth;
 								$this->map[strtoupper($httpMethod)][$url] = $call;
-							}
+								foreach ($args as $key => $value) {
+									$call = array($class, $method->getName());
+									$url .= '/$'.$key;
+									$call[] = $args;
+									$call[] = null;
+									$call[] = $noAuth;
+									$this->map[strtoupper($httpMethod)][$url] = $call;
+								}
+						}
 					}
-				}
 
-				if($chk){
-					$url = strtolower($basePath.$method->getName());
-					if ($url && $url[strlen($url) - 1] == '/') {
-						$url = substr($url, 0, -1);
-					}
+					if($chk){
+						$url = strtolower($basePath.$method->getName());
+						if ($url && $url[strlen($url) - 1] == '/') {
+							$url = substr($url, 0, -1);
+						}
 
-					$args = array();
-					foreach ($params as $param) {
-						$args[$param->getName()] = $param->getPosition();
-					}
-						$call = array($class, $method->getName());
-						$call[] = $args;
-						$call[] = null;
-						$call[] = $noAuth;
-						$this->map['GET'][$url] = $call;
-					foreach ($args as $key => $value) {
-						$call = array($class, $method->getName());
-						$url .= '/$'.$key;
-						$call[] = $args;
-						$call[] = null;
-						$call[] = $noAuth;
-						$this->map['GET'][$url] = $call;
+						$args = array();
+						foreach ($params as $param) {
+							$args[$param->getName()] = $param->getPosition();
+						}
+							$call = array($class, $method->getName());
+							$call[] = $args;
+							$call[] = null;
+							$call[] = $noAuth;
+							$this->map['GET'][$url] = $call;
+						foreach ($args as $key => $value) {
+							$call = array($class, $method->getName());
+							$url .= '/$'.$key;
+							$call[] = $args;
+							$call[] = null;
+							$call[] = $noAuth;
+							$this->map['GET'][$url] = $call;
+						}
 					}
 				}
 			}
 		}
 	}
 
-	public function getPath()
-	{
+	public function getPath() {
 		$path = preg_replace('/\?.*$/', '', $_SERVER['REQUEST_URI']);
 		// remove root from path
 		if ($this->root) $path = preg_replace('/^' . preg_quote($this->root, '/') . '/', '', $path);
@@ -535,8 +487,7 @@ class RestServer
 		return $path;
 	}
 
-	public function getMethod()
-	{
+	public function getMethod() {
 		$method = $_SERVER['REQUEST_METHOD'];
 		$override = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']) ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] : (isset($_GET['method']) ? $_GET['method'] : '');
 		if ($method == 'POST' && strtoupper($override) == 'PUT') {
@@ -549,8 +500,7 @@ class RestServer
 		return $method;
 	}
 
-	public function getFormat()
-	{
+	public function getFormat() {
 		$format = RestFormat::JSON;
 		$accept_mod = null;
 		if(isset($_SERVER["HTTP_ACCEPT"])) {
@@ -581,72 +531,14 @@ class RestServer
 		return $format;
 	}
 
-	public function chkRole($moduleid,$action){
-		if($this->jwt && $this->jwt->status) {
-			$level = $this->jwt->level;
-			$accessible = (bool) $level & 1 << ($moduleid - 1);
-		} else {
-			return false;
-		}
-	}
-
-	private function jwt() {
-		$this->token  = $this->getBearerToken();
-		$token = $this->token;
-		$o = new \stdClass();
-		$o->status = false;
-		$o->verify = false;
-		$o->token = $token;
-		$o->method = __FUNCTION__;
-		$host = $this->server['HTTP_HOST'];
-		if($token){
-		    $token = (new Parser())->parse($token);
-		    $o->verify = $token->verify($this->signer, $this->secretKey);
-			if($o->verify) {
-				$o->header = $token->getHeaders(); // Retrieves the token header
-				$o->claims = $token->getClaims(); // Retrieves the token claims
-				$o->jti = $token->getHeader('jti'); // will print "4f1g23a12aa"
-				$o->iss = $token->getClaim('iss'); // will print "http://example.com"
-				$o->uid = $token->getClaim('uid'); // will print "1"
-				$o->username = $token->getClaim('username'); // will print "1"
-				$o->role = $token->getClaim('role'); // will print "1" admin user superuser
-				$o->level = $token->getClaim('level'); // will print "1" FFFFFFFFFFFFFFFFFF
-			    
-			    $validationData = new ValidationData();
-			    $validationData->setIssuer($host);
-			    $validationData->setAudience($host);
-			    $o->validate = $token->validate($validationData);
-			    $o->host = $host;
-			    $o->status = $o->validate;
-			}
-		}
-		$this->jwtobj = $o;
-	}
-
-
-	public function getData()
-	{
+	public function getData() 	{
 		$data = file_get_contents('php://input');
 		$data = json_decode($data, $this->jsonAssoc);
 
 		return $data;
 	}
 
-
-   public function tokenverify()   {
-        if ($this->token) {
-        	$token = (new Parser())->parse($this->token);
-            return $token->verify($this->signer, $this->secretKey);
-        } else {
-            return false;
-        }
-    }
-
-
-
 	public function sendData($data){
-
-		header( "HTTP/1.1 200 OK" );
 		header("Cache-Control: no-cache, must-revalidate");
 		header("Expires: 0");
 		header("Access-Control-Allow-Credentials: true");
@@ -657,7 +549,6 @@ class RestServer
         header('Access-Control-Expose-Headers: Authorization');
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 		// header('Content-Type: application/json; charset=utf-8');
-
 		if($this->token){
 			Header('Authorization: '.$this->token);
 			// header('Authorization: Bearer '.$this->token);
@@ -665,6 +556,7 @@ class RestServer
 			// Header('authorizations: '.$this->token);
 			// Header('Authorization: '.$this->token);
 		}
+
 		header('Content-Type: ' . $this->format);
 		
 		if ($this->format == RestFormat::XML) {
@@ -698,6 +590,7 @@ class RestServer
 	}
 
 	public function setStatus($code){ 
+		consolelog('set Status----->http_response_code--->',$code);
 		if (function_exists('http_response_code')) {
 			http_response_code($code);
 		} else {
@@ -706,7 +599,6 @@ class RestServer
 			header("$protocol $code");
 		}
 	}
-
 	private function xml_encode($mixed, $domElement=null, $DOMDocument=null) {  //@todo add type hint for $domElement and $DOMDocument
 		if (is_null($DOMDocument)) {
 			$DOMDocument =new DOMDocument;
@@ -745,45 +637,6 @@ class RestServer
 			}
 		}
 	}
-
-
-	/** 
-	 * Get hearder Authorization
-	 * */
-	private function getAuthorizationHeader(){
-	        $headers = null;
-	        if (isset($_SERVER['Authorization'])) {
-	            $headers = trim($_SERVER["Authorization"]);
-	        }
-	        else if (isset($_SERVER['HTTP_AUTHORIZATION'])) { //Nginx or fast CGI
-	            $headers = trim($_SERVER["HTTP_AUTHORIZATION"]);
-	        } elseif (function_exists('apache_request_headers')) {
-	            $requestHeaders = apache_request_headers();
-	            // Server-side fix for bug in old Android versions (a nice side-effect of this fix means we don't care about capitalization for Authorization)
-	            $requestHeaders = array_combine(array_map('ucwords', array_keys($requestHeaders)), array_values($requestHeaders));
-	            //print_r($requestHeaders);
-	            if (isset($requestHeaders['Authorization'])) {
-	                $headers = trim($requestHeaders['Authorization']);
-	            }
-	        }
-	        return $headers;
-	}
-	/**
-	 * get access token from header
-	 * */
-	private function getBearerToken() {
-	    $headers = $this->getAuthorizationHeader();
-	    // HEADER: Get the access token from the header
-	    // /Bearer\s((.*)\.(.*)\.(.*))/
-	    if (!empty($headers)) {
-	        if (preg_match('/Bearer\s(\S+)/', $headers, $matches)) {
-	            return $matches[1];
-	        }
-	    }
-	    return null;
-	}
-
-
 	private $codes = array(
 		'100' => 'Continue',
 		'200' => 'OK',

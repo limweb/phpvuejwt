@@ -34,11 +34,8 @@ class QuestionController extends BaseController {
 
 
     /**
-     * Returns a JSON string object to the browser when hitting the root of the domain
-     *
      * @url POST /
      * @url GET /
-     * @noAuth
      */
     public function questions()
     {
@@ -66,6 +63,28 @@ class QuestionController extends BaseController {
         return base64_encode(json_encode($o));
     }
 
+
+    public function postAnswer(){
+        // dump(json_encode($this->server->jwtobj));
+        // dump('status-->'.$this->server->jwtobj->status);
+        // dump('verify-->'.$this->server->jwtobj->verify);
+        // dump('validate-->'.$this->server->jwtobj->validate);
+        // dump('token-->'.$this->server->jwtobj->token);
+        // dump('jti-->'.$this->server->jwtobj->jti);
+        // dump('iss-->'.$this->server->jwtobj->iss);
+        // dump('uid-->'.$this->server->jwtobj->uid);
+        // dump('username-->'.$this->server->jwtobj->username);
+        // dump('role-->'.$this->server->jwtobj->role);
+        // dump('level-->'.$this->server->jwtobj->level);
+        // dump('host-->'.$this->server->jwtobj->host);
+
+        $ua = new Useranswer();
+        $ua->user_id = 1;
+        $ua->json_date = json_encode($this->server->data);
+        $rs = $ua->save();
+        return $rs;
+        // dump($rs);
+    }
 
 
 }
