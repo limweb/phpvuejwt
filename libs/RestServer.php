@@ -105,8 +105,7 @@ if (!function_exists('logAccess')) {
  *
  * @author jacob
  */
-class RestServer
-{
+class RestServer {
 	//@todo add type hint
 	public $url;
 	public $method;
@@ -143,7 +142,6 @@ class RestServer
 		}
 		$this->server = $_SERVER;
 		$this->root = $dir;
-		$this->token = null;
 	}
 
 	public function  __destruct()	{
@@ -156,6 +154,7 @@ class RestServer
 		}
 	}
 
+	// for /routes only to view  any route in this system
 	public function routes(){
 		return $this->map;
 	}
@@ -198,7 +197,6 @@ class RestServer
 			$this->sendData($this->options());
 		} 
 
-		
 		list($obj, $method, $params, $this->params, $noAuth) = $this->findUrl();
 		if ($obj) {
 			if (is_string($obj)) {
@@ -236,8 +234,7 @@ class RestServer
 			$this->handleError(404);
 		}
 	}
-	public function setRootPath($path)
-	{
+	public function setRootPath($path) 	{
 		$this->rootPath = '/'.trim($path, '/').'/';
 	}
 	public function setJsonAssoc($value) {
@@ -549,8 +546,8 @@ class RestServer
         header('Access-Control-Expose-Headers: Authorization');
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 		// header('Content-Type: application/json; charset=utf-8');
-		if($this->token){
-			Header('Authorization: '.$this->token);
+		if($this->_token){
+			Header('Authorization: '.$this->_token);
 			// header('Authorization: Bearer '.$this->token);
 			// Header('X-Authorization: '.$this->token);
 			// Header('authorizations: '.$this->token);

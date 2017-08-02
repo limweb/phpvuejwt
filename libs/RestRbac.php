@@ -1,6 +1,7 @@
 <?php
 
 namespace Jacwright\RestServer;
+use Jacwright\RestServer\RestJwt;
 
 class RestRbac {
 	private $rbac = ['r','c','u','d','p','e','a','t'];
@@ -8,13 +9,10 @@ class RestRbac {
 	private $role = null;
 	private $level = null;
 
-	public function __construct($jwt =null)  {
-		// if($jwt && $jwt->getJwt()) {
-		// 	$this->jwt = $jwt;
-		// 	$this->role = $jwt->getJwt()->getClaim('role');
-		// 	$this->level = $jwt->getJwt()->getClaim('level');
-		// }
+	public function __construct($jwt=null)  {
+		$this->jwt = ($jwt ? $jwt  : (new RestJwt()) );
 	}
+
 
 	//---- check ----- role base system ------------
 	public function chk($module=null,$action=null){
@@ -53,10 +51,10 @@ class RestRbac {
 
 	//------------------ RBAC ---------------------------
 	public function hasRole($r) { // admin   user  ['admin','user']
-		if($this->jwt && $this->jwt->status) {
+		if($this->jwt && $this->jwt->getStatus()) {
 			$roles = (is_string($r) ? [ $r ] : $r );
 			foreach($roles as $role) {
-				if($this->jwt->chkAuth() && $this->role == $role ) {
+				if($this->jwt->chkauth() && $this->role == $role ) {
 					return true;
 				}
 			}
@@ -94,8 +92,6 @@ class RestRbac {
 		'etc'=>'t',
 		'custom'=>'t'
 		];
-
-
 }
 
 // admin:FF

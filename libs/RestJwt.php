@@ -10,15 +10,23 @@ use Lcobucci\JWT\Token;
 class RestJwt {
 
 	private $token = null; // String   header.palyload.signature
-	public $signer=null ; //obj of Lcobucci\JWT\Signer
+	public  $signer=null ; //obj of Lcobucci\JWT\Signer
 	private $jwt = null;  //obj of Lcobucci\JWT\Token;
+	public  $_status = false;
+	private $_verify = false;
+	private $_validate = false;
 
 	public function __construct() {
 		$this->signer = new Sha256();
 		$this->token = $this->getBearerToken();
-		$this->jwtobj();
+		$this->token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjRmMWcyM2ExMmFhIn0.eyJpc3MiOiIxMjcuMC4wLjEiLCJhdWQiOiIxMjcuMC4wLjEiLCJqdGkiOiI0ZjFnMjNhMTJhYSIsImlhdCI6MTUwMTY2MjkxNywiZXhwIjoxNTAxNjY2NTE3LCJ1c2VybmFtZSI6ImFkbWluIiwidWlkIjoxLCJyb2xlIjoiYWRtaW4iLCJsZXZlbCI6IkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkYifQ.zE6z191gK2bJY9a04Elc38O9sZ_IpmcJOaOdFqX6194';
+		$this->initjwtobj();
 	}
 
+
+   public function getStatus() {
+   		return $this->_status;
+   }
 
 	 // return  String   header.palyload.signature
 	public function getToken() {
@@ -30,6 +38,20 @@ class RestJwt {
 		if($this->jwt) return $this->jwt;
 		return null;
 	}
+
+	public function getJwtobjdata($datas=[]){
+		if($this->jwt && $this->_status){
+			if($datas == []) $datas = ['username','uid','role','level','iss','aud','jti','iat','exp',];
+			$o = new \stdClass();
+			foreach ($datas as $data) {
+				$o->{$data} = $this->jwt->getClaim($data);
+			}
+			return $o;
+		} else {
+			return null;
+		}
+	}
+
 
 	/***---- gen token for jwt ----
 		{ 
@@ -78,9 +100,8 @@ class RestJwt {
 				->set('role',$this->jwt->getClaim('role'))
 				->set('level',$this->jwt->getClaim('level'))
 				->sign($this->signer,SECRETKEY);
-				$this->server->token  = $builder->getToken()->__toString();
+				$o->jwt = $builder->getToken()->__toString();
 				$o->token = $builder->getToken()->__toString();
-				$o->jwt = $this->server->token;
 			}
 			return $o;
 	}
@@ -100,9 +121,6 @@ class RestJwt {
 			    $validationData->setAudience($remotehost);
 			    $validate = $this->jwt->validate($validationData);
 			    $o->status =  $validate;
-				// list($header, $payload, $signature) = explode(".", $token);
-				// $o->header =  json_decode(base64_decode($header));
-				// $o->payload = json_decode(base64_decode($payload));
 			}
 		}
 		if($o->status){
@@ -115,9 +133,8 @@ class RestJwt {
 	//---- verify from token payload check signer only ----
 	// return true/false
 	public function tokenverify()   {
-		if ($this->token) {
-			$token = (new Parser())->parse($this->token);
-			return $token->verify($this->signer,SECRETKEY);
+		if ($this->jwt) {
+			return $this->jwt->verify($this->signer,SECRETKEY);
 		} else {
 			return false;
 		}
@@ -162,17 +179,18 @@ class RestJwt {
 
 
 	//---- gen  Lcobucci\JWT\Token; obj form toekn
-	private function jwtobj() {
+	private function initjwtobj() {
 		$remotehost = $_SERVER['REMOTE_ADDR'];
 		if($this->token){
 		    $token = (new Parser())->parse($this->token);
-		    $verify = $token->verify($this->signer,SECRETKEY);
-			if($verify) {
+		    $this->_verify = $token->verify($this->signer,SECRETKEY);
+			if($this->_verify) {
 			    $validationData = new ValidationData();
 			    $validationData->setIssuer($remotehost);
 			    $validationData->setAudience($remotehost);
-			    $validate = $token->validate($validationData);
-				if($validate) $this->jwt = $token;
+			    $this->_validate = $token->validate($validationData);
+				$this->_status = $this->_validate;
+				if($this->_validate) $this->jwt = $token;
 			}
 		}
 	}
