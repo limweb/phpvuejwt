@@ -6,10 +6,17 @@ use \Jacwright\RestServer\RestController as BaseController;
 class TController extends BaseController {
 
 	use DbTrait;  // if use DbTrait please add prefix 
-
 	protected function model(){
 		return new User();
 	}
+
+
+	/**
+	 * @noAuth
+	 */
+    public function getNone() {
+        return uuid();
+    }
 
 	/**
 	 * @noAuth

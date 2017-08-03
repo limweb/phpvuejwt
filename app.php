@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/libs/RestServer.php';
+require_once __DIR__.'/libs/utils.php';
 require_once __DIR__.'/configs/config.php';
 require_once __DIR__.'/configs/models.php';
 

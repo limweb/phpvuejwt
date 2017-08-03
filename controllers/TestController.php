@@ -3,9 +3,9 @@
 use \Jacwright\RestServer\RestException;
 use \Jacwright\RestServer\RestController as BaseController;
 
-
 class TestController extends BaseController {
-    
+
+
     public function getTest($id = null,$a=null,$b=null,$c=null) {
         $o = new stdClass();
         $o->url = $this->server->url;

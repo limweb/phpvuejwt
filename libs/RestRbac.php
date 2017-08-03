@@ -11,6 +11,10 @@ class RestRbac {
 
 	public function __construct($jwt=null)  {
 		$this->jwt = ($jwt ? $jwt  : (new RestJwt()) );
+		if($this->jwt){
+			$jwtdata =  $this->jwt->getJwtobjdata();
+			if($jwtdata) $this->role = $jwtdata->role;
+		}
 	}
 
 
@@ -68,7 +72,7 @@ class RestRbac {
 			if($m){
 				return $m[0];// ยังไม่ได้ทำ
 			} else {
-				$ac = $actions[strtolower($match[1])];
+				$ac = $this->actions[strtolower($match[1])];
 				if($ac){
 					return (bool) in_array($ac,$this->rbac);
 				} 

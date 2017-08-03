@@ -62,13 +62,21 @@ class RestJwt {
 		}
 	*/	
 	public function token($user=null) {
+
+		// – iss (issuer) : เว็บหรือบริษัทเจ้าของ token
+		// – sub (subject) : subject ของ token
+		// – aud (audience) : ผู้รับ token
+		// – exp (expiration time) : เวลาหมดอายุของ token
+		// – nbf (not before) : เป็นเวลาที่บอกว่า token จะเริ่มใช้งานได้เมื่อไหร่
+		// – iat (issued at) : ใช้เก็บเวลาที่ token นี้เกิดปัญหา
+		// – jti (JWT id) : เอาไว้เก็บไอดีของ JWT แต่ละตัวนะครับ
 		if($user) {
 		 	$now = time();
 		    $remotehost = $_SERVER['REMOTE_ADDR'];
 			$builder = new Builder();
 			$builder->setIssuer($remotehost) // Configures the issuer (iss claim)
                     ->setAudience($remotehost) // Configures the audience (aud claim)
-                    ->setId('4f1g23a12aa', true) // Configures the id (jti claim), replicating as a header item
+                    ->setId(uuid(), true) // Configures the id (jti claim), replicating as a header item
 			        ->setIssuedAt($now)
 			        ->setExpiration($now + EXPTIME)
 		            ->set('username', $user->username)
