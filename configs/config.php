@@ -18,6 +18,7 @@ define('DB_CHARSET'	, 'utf8');
 define('DB_COLLATE'	, '');
 
 define('DEBUG',true);
+define('CROS',true);
 define('EXPTIME', 60*60*24*30);  //  60sec * 60 mins * 24 hr * 30 day 
 define('SECRETKEY','02443f12-e1ef-11e5-b86d-9a79f06e9478');
 define('USEDROLE',true);
