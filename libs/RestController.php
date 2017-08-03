@@ -1,5 +1,7 @@
 <?php
 namespace Jacwright\RestServer; 
+require_once __DIR__.'/../libs/DbTrait.php';
+
 class  RestController {
 
 		public function __construct() {

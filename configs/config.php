@@ -10,13 +10,13 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 date_default_timezone_set('Asia/Bangkok');
 
-define('DB_NAME'	, 'questionnaire');
-define('DB_USER'	, 'root');
-define('DB_PASSWORD', '');
+define('DB_NAME'	, 'dbname');
+define('DB_USER'	, 'dbuser');
+define('DB_PASSWORD', 'dbpass');
 define('DB_HOST'	, '127.0.0.1');
-// define('DB_HOST'	, '192.168.1.23');
 define('DB_CHARSET'	, 'utf8');
 define('DB_COLLATE'	, '');
+
 define('DEBUG',true);
 define('EXPTIME', 60*60*1);  //  60sec * 60 mins * 1 hr
 define('SECRETKEY','02443f12-e1ef-11e5-b86d-9a79f06e9478');

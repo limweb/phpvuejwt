@@ -1,5 +1,4 @@
 <?php
-
 use \Jacwright\RestServer\RestException;
 use \Jacwright\RestServer\RestController as BaseController;
 
@@ -12,6 +11,12 @@ function tree(&$role) {
 
 
 class RController extends BaseController {
+
+	use DbTrait; 
+
+	protected function model(){
+		return true;
+	}
 
 	/**
 	 * @noAuth

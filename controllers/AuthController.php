@@ -99,7 +99,7 @@ class  AuthController extends BaseController {
 			$username = '';
 			if($user == 'admin') { $username=$user; $role = 'admin';  $level = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
 			if($user == 'staff') { $username=$user; $role = 'staff';  $level = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
-			if($user == 'user')  { $username=$user; $role = 'user';   $level = 'FAFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
+			if($user == 'test')  { $username=$user; $role = 'user';   $level = 'FAFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
 			// $user = "";
 			// $user = User::where('username','')->where('password','')->first();
 			if($username) {
