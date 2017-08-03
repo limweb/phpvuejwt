@@ -19,7 +19,7 @@ class RestJwt {
 	public function __construct() {
 		$this->signer = new Sha256();
 		$this->token = $this->getBearerToken();
-		// $this->token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjRmMWcyM2ExMmFhIn0.eyJpc3MiOiIxMjcuMC4wLjEiLCJhdWQiOiIxMjcuMC4wLjEiLCJqdGkiOiI0ZjFnMjNhMTJhYSIsImlhdCI6MTUwMTc1MDgzMiwiZXhwIjoxNTAxNzU0NDMyLCJ1c2VybmFtZSI6ImFkbWluIiwidWlkIjoxLCJyb2xlIjoiYWRtaW4iLCJsZXZlbCI6IkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkYifQ.1qdbktv7mtaOF5RlZwTtAIZon_ySR3KqaeABlK8LHT0';
+		// $this->token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjRmMWcyM2ExMmFhIn0.eyJpc3MiOiIxMjcuMC4wLjEiLCJhdWQiOiIxMjcuMC4wLjEiLCJqdGkiOiI0ZjFnMjNhMTJhYSIsImlhdCI6MTUwMTc1NjMyMywiZXhwIjoxNTAxNzk5NTIzLCJ1c2VybmFtZSI6ImFkbWluIiwidWlkIjoxLCJyb2xlIjoiYWRtaW4iLCJsZXZlbCI6IkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkYifQ.03GVyuD08Enl-7hKqU_Z7c4gDp3q2vYQrqMPeRJjoaw';
 		$this->initjwtobj();
 	}
 

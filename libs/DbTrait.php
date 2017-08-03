@@ -15,7 +15,7 @@ trait DbTrait {
   }
 
   /**
-  * @noAuth
+  * @ noAuth
   * @url GET /show/$id
  */
   public function show($id=null) {
@@ -46,7 +46,7 @@ trait DbTrait {
 
 
   /**
-  * @noAuth
+  * @ noAuth
   * @xurl GET /update/$id
   * @url PUT /$id
   */
@@ -67,7 +67,7 @@ trait DbTrait {
   }
 
   /**
-  * @noAuth
+  * @ noAuth
   * @xurl GET /delete/$id
   * @url DELETE /$id
   */
