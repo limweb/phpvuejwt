@@ -1,4 +1,5 @@
 <?php
+
 use \Jacwright\RestServer\RestException;
 use \Jacwright\RestServer\RestController as BaseController;
 
@@ -7,7 +8,7 @@ class RController extends BaseController {
 
 
 	public function getAdmin() {
-		if($this->rbac->hasRole(['user','superadmin'])){
+		if($this->rbac->hasRole(['user','superadmin','admin'])){
 			$jwtdata =  $this->jwt->getJwtobjdata();
 			echo 'Userid:',$jwtdata->uid,'<br/>';
 			echo 'Username:',$jwtdata->username,'<br/>';
@@ -18,6 +19,7 @@ class RController extends BaseController {
 	  		// echo 'Jti:',$jwtdata->jti,'<br/>';
 	  		// echo 'Iat:',$jwtdata->iat,'<br/>';
 	  		// echo 'Exp:',$jwtdata->exp,'<br/>';
+	  		echo 'canTest-->',$this->rbac->canRead('admin'),'<br/>';
 	  		echo 'canRead-->',$this->rbac->canRead(),'<br/>';
 	  		echo 'canCreate-->',$this->rbac->canCreate(),'<br/>';
 			echo 'canInsert-->',$this->rbac->canInsert(),'<br/>';

@@ -51,8 +51,8 @@ class SysController extends BaseController {
             $o->b = $b;
             $o->c = $c;
             $o->gentokentest =  $this->jwt->token(json_decode('{"username":"","id":1,"role":"admin","level":"FF"}'));
-            dump($this,$o);
-            // return $o;
+            // dump($this,$o);
+            return $o;
         }
     }
 
@@ -90,7 +90,9 @@ class SysController extends BaseController {
 
 
             }
+            echo '<tr><td colspan="6">--------------------------> END.-------------------------------------------------------------------------------------</td></tr>';
             echo '</tbody></table></center>';
+
         }
         exit(0);
     }

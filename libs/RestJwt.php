@@ -134,7 +134,7 @@ class RestJwt {
 		if($o->status){
 			return $o->status;
 		} else {
-			throw new RestException(401, "xxYou are not authorized to access this resource.");
+			throw new RestException(401, "You are not authorized to access this resource.");
 		}
 	}	
 

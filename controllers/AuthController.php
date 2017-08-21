@@ -19,10 +19,9 @@ class  AuthController extends BaseController {
 			$username = null;
 			if($this->server->mode == 'debug') {
 				$username = 'test';
-				if($user == 'admin') { $username=$user;  $role = 'admin';  $level = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
-				if($user == 'staff') { $username=$user;  $role = 'staff';  $level = 'FAFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
-				if($user == 'user')  { $username=$user;  $role = 'user';   $level = 'FAFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
-				if($user == 'test')  { $username=$user;  $role = 'none';   $level = '8080808080808080808080808080'; }
+				if($user == 'admin') { $username=$user; $role = 'admin';  $level = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
+				if($user == 'staff') { $username=$user; $role = 'staff';  $level = 'FAFFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
+				if($user == 'test')  { $username=$user; $role = 'user';   $level = '808080808080808080808080808080'; }
 
 
 				$user = new stdClass();
