@@ -744,4 +744,18 @@ class TlenController extends BaseController {
 				</html>
 	<?php }
 
+
+	/**
+	 * @noAuth
+	 * @url GET  /test
+	 */
+	public function test(){
+		setConnection('sys_');
+		$us = User::get();
+		dump($us);
+		setConnection();
+		$us = User::get();
+		dump($us);
+	}
+
 }

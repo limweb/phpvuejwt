@@ -28,10 +28,8 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model as Model;
 use Carbon\Carbon;
 
-
 $capsule = new Capsule;
-
-$capsule->addConnection([
+$config = [
 	'driver'    => 'mysql',
 	'host'      => DB_HOST,
 	'database'  => DB_NAME,
@@ -40,11 +38,28 @@ $capsule->addConnection([
 	'charset'   => 'utf8',
 	'collation' => 'utf8_unicode_ci',
 	'prefix'    => '',
-	],'default' );
+	];
 
+$capsule->addConnection($config,'default' );
 
 // // Make this Capsule instance available globally via static methods... (optional)
 $capsule->setAsGlobal();
 
 // // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
 $capsule->bootEloquent();
+
+function setConnection($prefix='',$dbname=null,$host=null,$username=null,$password=null) {
+	global $config;
+	$config['database'] = ( $dbname ?: DB_NAME );
+	$config['prefix'] = ( $prefix ?:'');
+	$config['host']	= ($host ?: DB_HOST);
+	$config['username']	= ($username ?: DB_USER);
+	$config['password']	= ($password ?: DB_PASSWORD);
+	$capsule = new Capsule;
+	$capsule->addConnection($config, 'default');
+	$capsule->bootEloquent();
+	// Capsule::setTablePrefix($prefix);
+	// echo Capsule::getTablePrefix();
+	// Capsule::setTablePrefix('sys_');
+	// echo Capsule::getTablePrefix();
+}

@@ -3,8 +3,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
-
-
 class Package  extends  Model  { 
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];    
@@ -20,6 +18,15 @@ class User  extends  Model  {
     protected $hidden =   ["password"];
     protected $fillable = ['user','password','role_id'];
     // protected $guarded =  ['package'];
+
+    public function aaaa(){
+        return  'aaaa';
+    }
+
+    public function __construct(array $attributes = []) {
+        //$this->setRawAttributes(['expire_date' => Carbon::now()->addDays(7)],true);
+        parent::__construct($attributes);
+    }
 
     public function role() {
         return $this->belongsTo('Role','role_id','id');
@@ -105,4 +112,6 @@ class Company  extends  Model  {
         protected  $primaryKey='id';
 }
         
-        
+
+
+
