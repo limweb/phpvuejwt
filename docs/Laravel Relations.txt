@@ -1,0 +1,70 @@
+One To One(hasOne,belongsTo)
+DB: user(id,name) -----  address(id,user_id,address1,country)
+
+user hasOne address
+-------------------------->
+<--------------------------
+address belongsTo user
+
+
+One To Many(hasMany,belongsTo)
+DB: user(id,name) ----> posts(id,user_id,post)
+
+user hasMany post
+-------------------------->
+<--------------------------
+post belongsTo user
+
+
+Many To Many(belongsToMany)
+DB: posts(id,name) ---> post_tag(post_id,tag_id) <----- tags(id,name)
+
+post belongsToMany tag
+-------------------------->
+table post_tag( post_id,tag_id)
+<--------------------------
+tag  belongsToMany post
+
+
+Has Many Through(hasManyThrough)
+DB: counties(id,name)->users(id,country_id,name)->posts(id,user_id,post)
+
+country------>hasManyThrough----->posts
+
+
+
+Polymorphic  Relations  (Many<--One) (morphMany,morphTo)
+DB: 
+staff(id,name)     \
+					----- photos(id,path,imageble_id,imageble_type)
+product(id,name)   /
+
+----------------  /
+
+staff  morphMany->photo->imageble
+--------------------------> photo
+photo  morphTo()  imageble
+--------------------------> photo
+product morphMany->photo->imageble
+
+
+
+Many To Many Polymorphic Relations (Many<--->Many)(morphToMany,morphedByMany)
+DB: 
+posts (id,name)  \
+				  ---------> taggables (id,tag_id,taggable_id,taggable_type)->tags (id,name)
+videos (id,name) /
+
+--------------  /
+
+posts,video  --------morphToMany->taggable------> tags
+tags -------morphedByMany->taggable--------> posts,video
+
+
+
+
+
+
+
+
+

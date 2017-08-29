@@ -17,6 +17,8 @@ define('DB_HOST'	, '127.0.0.1');
 define('DB_CHARSET'	, 'utf8');
 define('DB_COLLATE'	, '');
 
+
+define('APPMODE','debug'); // debug or production
 define('DEBUG',true);
 define('CROS',true);
 define('EXPTIME', 60*60*24*30);  //  60sec * 60 mins * 24 hr * 30 day 
@@ -48,6 +50,13 @@ $capsule->setAsGlobal();
 // // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
 $capsule->bootEloquent();
 
+/**
+ * @param prefix
+ * @param dbname
+ * @param host
+ * @param username
+ * @param password
+ */ 
 function setConnection($prefix='',$dbname=null,$host=null,$username=null,$password=null) {
 	global $config;
 	$config['database'] = ( $dbname ?: DB_NAME );

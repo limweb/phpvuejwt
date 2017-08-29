@@ -4,7 +4,7 @@ use \Jacwright\RestServer\RestController as BaseController;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class TlenController extends BaseController {
-
+	
 
 	/**
 	 * @noAuth 
@@ -697,10 +697,12 @@ class TlenController extends BaseController {
 							// dump($user,$user->package,$totalaccount,$totaldb,$modules);
 							$o = new stdClass();
 							$o->user = $user;
+							$o->user->getTableColumns;
 							$o->accounts = $accounts;
 							$o->dbs = $dbs;
 							$o->modules = $modules;
 							$o->permiss = $permitype;
+
 							$o->test = Capsule::getSchemaBuilder()->getColumnListing('roles_copy');
 					} else {
 						throw new Exception("no user in this id", 1);
@@ -752,10 +754,501 @@ class TlenController extends BaseController {
 	public function test(){
 		setConnection('sys_');
 		$us = User::get();
-		dump($us);
+		// dump($us);
 		setConnection();
-		$us = User::get();
-		dump($us);
+		$us = User::isParent()->isSysadmin()->get();
+		// dump($us->toArray());
+		$tableName = 'users';
+		$colName ='id';
+
 	}
 
+
+	/**
+	 * @noAuth
+	 * @url GET /crudx
+	 * @url POST /crud/$table
+	 * @url POST /crud/$table/$page
+	 * @url POST /crud/$table/$page/$perpage
+	 * @url POST /crud/$table/$page/$perpage/$kw
+	 * @url PUT /crud/$table/$id
+	 * @url PUT /crud/$table/$id/$page
+	 * @url PUT /crud/$table/$id/$page/$perpage
+	 * @url PUT /crud/$table/$id/$page/$perpage/$kw
+	 * @url DELETE /crud/$table/$id
+	 * @url DELETE /crud/$table/$id/$page
+	 * @url DELETE /crud/$table/$id/$page/$perpage
+	 * @url DELETE /crud/$table/$id/$page/$perpage/$kw
+	 */
+	public function postCrud($table=null,$id=null,$page=1,$perpage=15,$kw=''){
+		$o = new stdClass();
+		$o->method = $this->server->method;
+		if(empty($table)) return $o;
+		switch ($this->server->method) {
+			case 'PUT':
+				$sql ='select * from '.$table.' where id =  ? ';
+				$o->item = Capsule::select($sql,[$id]);
+				$o->post = $this->server->data;
+				// $o->cols = Capsule::select('DESCRIBE '.$table);
+				$o->cols = Dbcolinfo::where('tbname',$table)->get();
+				$o->rows = Capsule::select('select * from '.$table);
+				break;
+			case 'POST':
+				if($this->server->data && empty($this->server->data->id)){
+					$o->method = 'insert';
+					$o->post = $this->server->data;
+				}
+				// $o->cols = Capsule::select('DESCRIBE '.$table);
+				$o->cols = Dbcolinfo::where('tbname',$table)->get();
+				$o->rows = Capsule::select('select * from '.$table);
+				break;
+			case 'DELETE':
+				$sql ='select * from '.$table.' where id =  ? ';
+				$o->item = Capsule::select($sql,[$id]);
+				$o->cols = Dbcolinfo::where('tbname',$table)->get();
+				// $o->cols = Capsule::select('DESCRIBE '.$table);
+				$o->rows = Capsule::select('select * from '.$table);
+				break;
+			default:
+				$o->message ='ok';
+				break;
+		}
+		return $o;
+
+	}
+
+	/**
+	 * @noAuth
+	 * @url GET /crud
+	 */
+	public function crud(){ 
+		$tables = Capsule::select('SHOW TABLES');
+		?>
+			<html>
+			<head>
+				<meta charset="utf-8">
+				<meta http-equiv="X-UA-Compatible" content="IE=edge">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+				<title>CRUD</title>
+				<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.css" />
+				<link rel='stylesheet' href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" >
+				<script src="https://unpkg.com/vue-strap/dist/vue-strap.min.js"></script>
+			    <style type="text/css" media="screen">
+			        @-webkit-keyframes a{0%{opacity:0;bottom:-15px;max-height:0;max-width:0;margin-top:0}30%{opacity:.8;bottom:-3px}to{opacity:1;bottom:0;max-height:200px;margin-top:12px;max-width:400px}}@keyframes a{0%{opacity:0;bottom:-15px;max-height:0;max-width:0;margin-top:0}30%{opacity:.8;bottom:-3px}to{opacity:1;bottom:0;max-height:200px;margin-top:12px;max-width:400px}}@-webkit-keyframes b{0%{opacity:1;bottom:0}30%{opacity:.2;bottom:-3px}to{opacity:0;bottom:-15px}}@keyframes b{0%{opacity:1;bottom:0}30%{opacity:.2;bottom:-3px}to{opacity:0;bottom:-15px}}@-webkit-keyframes c{0%{opacity:0}30%{opacity:.5}to{opacity:.6}}@keyframes c{0%{opacity:0}30%{opacity:.5}to{opacity:.6}}@-webkit-keyframes d{0%{opacity:.6}30%{opacity:.1}to{opacity:0}}@keyframes d{0%{opacity:.6}30%{opacity:.1}to{opacity:0}}.notyf__icon--alert,.notyf__icon--confirm{height:21px;width:21px;background:#fff;border-radius:50%;display:block;margin:0 auto;position:relative}.notyf__icon--alert:after,.notyf__icon--alert:before{content:"";background:#ed3d3d;display:block;position:absolute;width:3px;border-radius:3px;left:9px}.notyf__icon--alert:after{height:3px;top:14px}.notyf__icon--alert:before{height:8px;top:4px}.notyf__icon--confirm:after,.notyf__icon--confirm:before{content:"";background:#3dc763;display:block;position:absolute;width:3px;border-radius:3px}.notyf__icon--confirm:after{height:6px;-webkit-transform:rotate(-45deg);transform:rotate(-45deg);top:9px;left:6px}.notyf__icon--confirm:before{height:11px;-webkit-transform:rotate(45deg);transform:rotate(45deg);top:5px;left:10px}.notyf__toast{display:block;overflow:hidden;-webkit-animation:a .3s forwards;animation:a .3s forwards;box-shadow:0 1px 3px 0 rgba(0,0,0,.45);position:relative;padding-right:13px}.notyf__toast.notyf--alert{background:#ed3d3d}.notyf__toast.notyf--confirm{background:#3dc763}.notyf__toast.notyf--disappear{-webkit-animation:b .3s 1 forwards;animation:b .3s 1 forwards;-webkit-animation-delay:.25s;animation-delay:.25s}.notyf__toast.notyf--disappear .notyf__message{opacity:1;-webkit-animation:b .3s 1 forwards;animation:b .3s 1 forwards;-webkit-animation-delay:.1s;animation-delay:.1s}.notyf__toast.notyf--disappear .notyf__icon{opacity:1;-webkit-animation:d .3s 1 forwards;animation:d .3s 1 forwards}.notyf__wrapper{display:table;width:100%;padding-top:20px;padding-bottom:20px;padding-right:15px;border-radius:3px}.notyf__icon{width:20%;text-align:center;font-size:1.3em;-webkit-animation:c .5s forwards;animation:c .5s forwards;-webkit-animation-delay:.25s;animation-delay:.25s}.notyf__icon,.notyf__message{display:table-cell;vertical-align:middle;opacity:0}.notyf__message{width:80%;position:relative;-webkit-animation:a .3s forwards;animation:a .3s forwards;-webkit-animation-delay:.15s;animation-delay:.15s}.notyf{position:fixed;bottom:20px;right:30px;width:20%;color:#fff;z-index:1}@media only screen and (max-width:736px){.notyf__container{width:90%;margin:0 auto;display:block;right:0;left:0}}        
+			        #content {
+			        	overflow: auto;
+			        }
+			    </style>
+			    <script type="text/javascript">
+						class Notyf {
+						    constructor(args) {
+						        this.notifications = [];
+						        var defaults = {
+						            delay: 2000,
+						            alertIcon: 'notyf__icon--alert',
+						            confirmIcon: 'notyf__icon--confirm'
+						        }
+
+						        if (arguments[0] && typeof arguments[0] == "object") {
+						            this.options = this.extendDefaults(defaults, arguments[0]);
+						        } else {
+						            this.options = defaults;
+						        }
+
+						        //Creates the main notifications container
+						        var docFrag = document.createDocumentFragment();
+						        var notyfContainer = document.createElement('div');
+						        notyfContainer.className = 'notyf';
+						        docFrag.appendChild(notyfContainer);
+						        document.body.appendChild(docFrag);
+						        this.container = notyfContainer;
+
+						        //Stores which transitionEnd event this browser supports
+						        this.animationEnd = this.animationEndSelect();
+						    }
+						    //---------- Public methods ---------------
+						    /**
+						     * Shows an alert card
+						     */
+						    alert(alertMessage) {
+						        var card = this.buildNotificationCard.call(this, alertMessage, this.options.alertIcon);
+						        card.className += ' notyf--alert';
+						        this.container.appendChild(card);
+						        this.notifications.push(card);
+						    }
+						    /**
+						     * Creates a generic card with the param message. Returns a document fragment.
+						     */
+						     buildNotificationCard(messageText, iconClass) {
+						        //Card wrapper
+						        var notification = document.createElement('div');
+						        notification.className = 'notyf__toast';
+
+						        var wrapper = document.createElement('div');
+						        wrapper.className = 'notyf__wrapper';
+
+						        var iconContainer = document.createElement('div');
+						        iconContainer.className = 'notyf__icon';
+
+						        var icon = document.createElement('i');
+						        icon.className = iconClass;
+
+						        var message = document.createElement('div');
+						        message.className = 'notyf__message';
+						        message.innerHTML = messageText;
+
+						        //Build the card
+						        iconContainer.appendChild(icon);
+						        wrapper.appendChild(iconContainer);
+						        wrapper.appendChild(message);
+						        notification.appendChild(wrapper);
+
+						        var _this = this;
+						        setTimeout(function() {
+						            notification.className += " notyf--disappear";
+						            notification.addEventListener(_this.animationEnd, function(event) {
+						                event.target == notification && _this.container.removeChild(notification);
+						            });
+						            var index = _this.notifications.indexOf(notification);
+						            _this.notifications.splice(index, 1);
+						        }, _this.options.delay);
+
+						        return notification;
+						    }
+
+						    // Determine which animationend event is supported
+						    animationEndSelect() {
+						        var t;
+						        var el = document.createElement('fake');
+						        var transitions = {
+						            'transition': 'animationend',
+						            'OTransition': 'oAnimationEnd',
+						            'MozTransition': 'animationend',
+						            'WebkitTransition': 'webkitAnimationEnd'
+						        }
+
+						        for (t in transitions) {
+						            if (el.style[t] !== undefined) {
+						                return transitions[t];
+						            }
+						        }
+						    }
+
+						    //---------- Private methods ---------------
+
+						    /**
+						     * Populates the source object with the value from the same keys found in destination
+						     */
+						    extendDefaults(source, destination) {
+						        // console.log('bf',source);
+						        for (source.property in destination) {
+						            console.log(source.property);
+						            //Avoid asigning inherited properties of destination, only asign to source the destination own properties
+						            if (destination.hasOwnProperty(source.property)) {
+						                source[source.property] = destination[source.property];
+						            }
+						        }
+						        // console.log('af',source);
+						        return source;
+						    }
+
+						    /**
+						     * Shows a confirm card
+						     */
+						    confirm(alertMessage) {
+						        var card = this.buildNotificationCard.call(this, alertMessage, this.options.confirmIcon);
+						        card.className += ' notyf--confirm';
+						        this.container.appendChild(card);
+						        this.notifications.push(card);
+						    }
+
+						}
+			    </script>
+
+			</head>
+			<body>
+		<div id="app" style="padding-left:10px;padding-right:10px;"> 
+	 	<select name="table" v-model="selecttb"  @change="selecttable">
+	 	<option value="0">please -- select table --</option>
+		<?php
+	 	 foreach ($tables as $table) {
+	 	 	 echo '<option value="'.$table->Tables_in_dbname.'">'.$table->Tables_in_dbname.'</option>';
+	 	 }
+		?>
+		</select><br/><br/><hr/>
+		<div v-if="selecttb != 0">
+			<h2>Table: <b>{{selecttb}}</b></h2>
+			<br/><br/>
+			<div  id="content">
+				<input style="float:right" type="button" name="insert" value="New" @click="newitem()">
+				<table width="100%" border="0">
+					<thead><tr>
+						<th v-for="(col,idx) in columns" v-show="col.show" >{{col.field}}</th>
+					<th>Action</th></tr></thead>
+					<tbody>
+						<tr v-for="rows in datarows">
+							<td v-for="(col,idx) in columns" v-show="col.show">
+								<!-- {{col.type}}/{{rows[col.field]}} -->
+								<div v-if="col.type=='number'"><input style="width:100px;" type="number" name="{{col.field}}" v-model="rows[col.field]"/></div>
+								<div v-if="col.type=='checkbox'"><input  type="checkbox" name="{{col.field}}" v-model="rows[col.field]" ><label>{{rows[col.field]}}</label></input></div>
+								<div v-if="col.type=='datetime'"><input style="width:255px;"  type="datetime-local" name="{{col.field}}" v-bind:value="convertdate(rows[col.field])" @change="changedate(rows,col.field,event)"/></div>
+								<div v-if="col.type=='textarea'"><textarea  name="{{col.field}}" v-model="rows[col.field]"></textarea></div>
+								<div v-if="col.type=='text'"><input  type="text" name="{{col.field}}" v-model="rows[col.field]" /></div>
+							</td>
+							<td><div style="display:flex">
+								<input type="button" name="edit" value="save" @click="editrow(rows)">
+								<input type="button" name="del" value="del" @click="deleterow(rows)">
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div v-else="select 1=0"> <center><b>Please Select Table</b></center></div>
+		</div>	
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script src="https://unpkg.com/vue-resource/dist/vue-resource.min.js"></script>
+		<script type="text/javascript">
+				
+				var vm = new Vue({
+				mixins:[],
+				data(){
+					return {
+						selecttb:'0',
+						page:1,
+						perpage:15,
+						kw:'',
+						columns:[],
+						datarows:[]
+					}
+				},
+				el:'#app',
+				methods:{
+				 alert(msg){ this.$nty.alert(msg);},
+			     confirm(msg){ this.$nty.confirm(msg); },
+			     selecttable(){
+			     	if(this.selecttb != 0) {
+				     	let url ='/tlen/crud/'+this.selecttb+'/'+this.page+'/'+this.perpage+'/'+ this.kw ;
+				     	axios.post(url)
+						    .then((response)=>{
+						       let data = response.data;
+						       console.log('post-->',data)
+						       this.columns = data.cols;
+						       this.datarows = data.rows;
+						       this.confirm('data '+ this.selecttb +' successed.')
+						    })
+						    .catch((error)=>{
+						       this.alert(error)
+						    });
+			     	}
+			     },
+			     editrow(item){
+				 	console.log('edititem=>',item)
+					if (confirm("Are you sure you want to update")) {
+						if(item.id) {
+					     	let url ='/tlen/crud/'+this.selecttb+'/'+ item.id +'/'+this.page+'/'+this.perpage+'/'+ this.kw ;
+					     	axios.put(url,item)
+							    .then((response)=>{
+							       let data = response.data;
+							       console.log(data)
+							       this.columns = data.cols;
+							       this.datarows = data.rows;
+							       this.confirm('update '+ this.selecttb +' successed.')
+							    })
+							    .catch((error)=>{
+							       this.alert(error)
+							    });
+						} else {
+				     	let url ='/tlen/crud/'+this.selecttb+'/'+ item.id +'/'+this.page+'/'+this.perpage+'/'+ this.kw ;
+					     	axios.post(url,item)
+							    .then((response)=>{
+							       let data = response.data;
+							       console.log(data)
+							       this.columns = data.cols;
+							       this.datarows = data.rows;
+							       this.confirm('update '+ this.selecttb +' successed.')
+							    })
+							    .catch((error)=>{
+							       this.alert(error)
+							    });
+						}
+					}
+			     },
+			     deleterow(item){
+			     	if (confirm("Are you sure you want to delete")) {
+						let url ='/tlen/crud/'+this.selecttb+'/'+ item.id +'/'+this.page+'/'+this.perpage+'/'+ this.kw ;
+			     		axios.delete(url)
+						    .then((response)=>{
+						       let data = response.data;
+						       console.log(data)
+						       this.columns = data.cols;
+						       this.datarows = data.rows;
+						       this.confirm('delete '+ this.selecttb +' successed.')
+						    })
+						    .catch((error)=>{
+						       this.alert(error)
+						    });
+  					}
+			     },
+			     convertdate(datestring) {
+			     	if(datestring){
+			     		return datestring.replace(' ','T');
+			     	} else{
+			     		return	
+			     	}
+			     },
+			     changedate(row,field,event){
+			     	let newdate = event.target.value;
+			     	newdate = newdate.replace('T',' ');
+			     	row[field]= newdate;
+			     	console.log(newdate);
+
+			     },
+			     newitem(){
+			     	let o = {};
+			     	this.columns.forEach((i)=>{
+			     		o[i.field] = null;
+			     	})
+			     	this.datarows.unshift(o);
+			     }
+
+				},
+				computed:{
+
+				 },
+				watch: { },
+				components:{ },
+				beforeCreate  () { },
+				created       () { },
+				beforeMount   () { },
+				mounted       () {  this.$nty = new Notyf(); },
+				beforeUpdate  () { },
+				updated       () { },
+				beforeDestroy () { },
+				destroyed     () { },
+				})	
+			</script>
+			</body>
+			</html>
+	<?php }
+
+	/**
+	 * @noAuth
+	 */
+	public function postTestpost(){
+		dump($this->post);
+	}
+
+
+	/**
+	 * @noAuth
+	 * @url GET /dbinfo
+	 */
+	public function dbinfo() {
+		$stringtype =['char','varchar','binary','char byte','varbinary','tinyblob','blob','mediumblob','longblob','tinytext','enum','set'];
+		$textareatype = ['text','mediumtext','longtext','json','row'];
+		$numbertype = ['tinyint','smallint','mediumint','int','integer','bigint','decimal','dec','numeric','fixed','float','double','real','bit'];
+		$chkboxtype = ['boolean'];
+		$datetimetype = ['datetime','timestamp'];
+		Capsule::table('dbcolumninfos')->truncate();
+		$tables = Capsule::select('Show tables');
+		foreach ($tables as $table) {
+			echo 'Table:---------->',$table->Tables_in_dbname,'<br/>';
+			$cols = Capsule::select('DESCRIBE '.$table->Tables_in_dbname);
+			foreach ($cols as $col) {
+				$dbinfo = new Dbcolinfo();
+				$dbinfo->tbname = $table->Tables_in_dbname;
+				$dbinfo->field = $col->Field;
+				preg_match ('/([a-zA-Z\s]*)\((.*)\).*$/', $col->Type, $matches);
+				$chktype = '';
+				$chklength = 0;
+				if(isset($matches[1]) && $matches[1]) {
+					$chktype = $matches[1];
+					$chklength = ($matches[2]?:0);
+				} else {
+					$chktype = $col->Type;
+				}
+				dump($chktype);
+				if(in_array($chktype,$datetimetype)) {
+					$dbinfo->type = 'datetime';
+				} else if (in_array($chktype,$numbertype)){
+						$dbinfo->type = 'number';
+				} else if (in_array($chktype,$chkboxtype)){
+						$dbinfo->type = 'checkbox';
+				} else if (in_array($chktype,$textareatype)){
+						$dbinfo->type = 'textarea';
+				} else {
+					if($chklength > 255 ) {
+						$dbinfo->type = 'textarea';
+					} else {
+						$dbinfo->type = 'text';
+					}
+				}
+				dump($dbinfo->type);
+				$dbinfo->length = $chklength;
+				$dbinfo->json = json_encode($col,JSON_UNESCAPED_SLASHES);
+				$dbinfo->save();
+				// dump($col);
+				// exit();
+			}
+		}
+		Dbcolinfo::where('field','created_by')->update(['show' => 0]);
+		Dbcolinfo::where('field','updated_by')->update(['show' => 0]);
+		Dbcolinfo::where('field','created_at')->update(['show' => 0]);
+		Dbcolinfo::where('field','updated_at')->update(['show' => 0]);
+		Dbcolinfo::where('field','deleted_at')->update(['show' => 0]);
+	}
+
+	/**
+	 * @noAuth
+	 * @url GET /sysrole
+	 */
+	public function sysrolepermiss() {
+	}
+
+
+	/**
+	 * @noAuth
+	 * @url GET /sysrolepermiss
+	 * @url POST /sysrolepermiss
+	 * @url PUT /sysrolepermiss
+	 * @url DEL /sysrolepermiss
+	 */
+	public function srolepermiss() {
+		$o = new stdClass();
+		$o->method = $this->server->method;
+		$o->function = __FUNCTION__;
+		
+		switch ($this->server->method) {
+			case 'GET':
+				$roles = Role::get();
+				foreach ($roles as $role) {
+					$role->permission;
+				}
+				$o->roles = $roles;
+				break;
+			case 'POST':
+				# code...
+				break;
+			case 'PUT':
+				# code...
+				break;
+			case 'DELETE':
+				# code...
+				break;
+			default:
+				# code...
+				break;
+		}
+		return $o;
+	}
+
+
+
 }
+
+
+

@@ -12,6 +12,7 @@ class Package  extends  Model  {
 
 class User  extends  Model  { 
     // use SoftDeletes;
+    // use LoadTrait;
     // protected $dates = ['deleted_at'];
     protected $table='users';
     protected $primaryKey='id';
@@ -56,6 +57,20 @@ class User  extends  Model  {
     public function profile() {
         return $this->hasOne('Profile');
     }
+    
+    public function scopeIsSysadmin($query){
+        return $query->where('sysadmin',1);
+    }
+
+    public function scopeIsParent($query){
+        return $query->where('parent_id',0);
+    }
+
+    //--- public function in model want start getCapitalname---
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
+
 }
 
 class Role  extends Model  {
@@ -75,6 +90,11 @@ class Role  extends Model  {
     public function permissions(){
         return $this->belongsToMany('Permission');
     }
+
+        //--- public function in model want start getCapitalname---
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
 }
 
 class permission_role extends Model {
@@ -91,11 +111,19 @@ class Permission  extends Model  {
     public function module(){
         return $this->belongsTo('Module');
     }
+    //--- public function in model want start getCapitalname---
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }    
 }
 
 class Module  extends Model  {
     protected  $table='modules';
     protected  $primaryKey='id';
+    //--- public function in model want start getCapitalname---
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }    
 }
 
 class Profile  extends Model  {
@@ -103,15 +131,33 @@ class Profile  extends Model  {
     // protected $dates = ['deleted_at'];
     protected  $table='profiles';
     protected  $primaryKey='id';
+    //--- public function in model want start getCapitalname---
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
 }
 
 class Company  extends  Model  { 
-        // use SoftDeletes;
-        // protected $dates = ['deleted_at'];
-        protected  $table='companies';
-        protected  $primaryKey='id';
+    // use SoftDeletes;
+    // protected $dates = ['deleted_at'];
+    protected  $table='companies';
+    protected  $primaryKey='id';
+    //--- public function in model want start getCapitalname---
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
 }
-        
+   
+class Dbcolinfo extends Model {
+    // use SoftDeletes;
+    // protected $dates = ['deleted_at'];
+    protected  $table='dbcolumninfos';
+    protected  $primaryKey='id';
+    //--- public function in model want start getCapitalname---
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }    
+}     
 
 
 
