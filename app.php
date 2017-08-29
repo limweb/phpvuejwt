@@ -68,7 +68,7 @@ if (!function_exists('logAccess')) {
     }
 }
 //------------- INIT----------------------------------------
-$server = new \Jacwright\RestServer\RestServer(APPMODE); // mode = debug / production
+$server = new \Jacwright\RestServer\RestServer(APPMODE); // mode = debug / production see config.php
 $server->addClass('SysController');
 $server->addClass('AuthController','/api/v1/auth');
 include __DIR__.'/route/routes.php';

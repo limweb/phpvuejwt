@@ -832,9 +832,14 @@ class TlenController extends BaseController {
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 				<title>CRUD</title>
 				<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
-				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.css" />
 				<link rel='stylesheet' href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" >
-				<script src="https://unpkg.com/vue-strap/dist/vue-strap.min.js"></script>
+				<!-- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"> -->
+ 				<!-- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css"> -->
+			    
+			    <!-- Add this to <head> -->
+				<link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap@next/dist/css/bootstrap.min.css"/>
+				<link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+
 			    <style type="text/css" media="screen">
 			        @-webkit-keyframes a{0%{opacity:0;bottom:-15px;max-height:0;max-width:0;margin-top:0}30%{opacity:.8;bottom:-3px}to{opacity:1;bottom:0;max-height:200px;margin-top:12px;max-width:400px}}@keyframes a{0%{opacity:0;bottom:-15px;max-height:0;max-width:0;margin-top:0}30%{opacity:.8;bottom:-3px}to{opacity:1;bottom:0;max-height:200px;margin-top:12px;max-width:400px}}@-webkit-keyframes b{0%{opacity:1;bottom:0}30%{opacity:.2;bottom:-3px}to{opacity:0;bottom:-15px}}@keyframes b{0%{opacity:1;bottom:0}30%{opacity:.2;bottom:-3px}to{opacity:0;bottom:-15px}}@-webkit-keyframes c{0%{opacity:0}30%{opacity:.5}to{opacity:.6}}@keyframes c{0%{opacity:0}30%{opacity:.5}to{opacity:.6}}@-webkit-keyframes d{0%{opacity:.6}30%{opacity:.1}to{opacity:0}}@keyframes d{0%{opacity:.6}30%{opacity:.1}to{opacity:0}}.notyf__icon--alert,.notyf__icon--confirm{height:21px;width:21px;background:#fff;border-radius:50%;display:block;margin:0 auto;position:relative}.notyf__icon--alert:after,.notyf__icon--alert:before{content:"";background:#ed3d3d;display:block;position:absolute;width:3px;border-radius:3px;left:9px}.notyf__icon--alert:after{height:3px;top:14px}.notyf__icon--alert:before{height:8px;top:4px}.notyf__icon--confirm:after,.notyf__icon--confirm:before{content:"";background:#3dc763;display:block;position:absolute;width:3px;border-radius:3px}.notyf__icon--confirm:after{height:6px;-webkit-transform:rotate(-45deg);transform:rotate(-45deg);top:9px;left:6px}.notyf__icon--confirm:before{height:11px;-webkit-transform:rotate(45deg);transform:rotate(45deg);top:5px;left:10px}.notyf__toast{display:block;overflow:hidden;-webkit-animation:a .3s forwards;animation:a .3s forwards;box-shadow:0 1px 3px 0 rgba(0,0,0,.45);position:relative;padding-right:13px}.notyf__toast.notyf--alert{background:#ed3d3d}.notyf__toast.notyf--confirm{background:#3dc763}.notyf__toast.notyf--disappear{-webkit-animation:b .3s 1 forwards;animation:b .3s 1 forwards;-webkit-animation-delay:.25s;animation-delay:.25s}.notyf__toast.notyf--disappear .notyf__message{opacity:1;-webkit-animation:b .3s 1 forwards;animation:b .3s 1 forwards;-webkit-animation-delay:.1s;animation-delay:.1s}.notyf__toast.notyf--disappear .notyf__icon{opacity:1;-webkit-animation:d .3s 1 forwards;animation:d .3s 1 forwards}.notyf__wrapper{display:table;width:100%;padding-top:20px;padding-bottom:20px;padding-right:15px;border-radius:3px}.notyf__icon{width:20%;text-align:center;font-size:1.3em;-webkit-animation:c .5s forwards;animation:c .5s forwards;-webkit-animation-delay:.25s;animation-delay:.25s}.notyf__icon,.notyf__message{display:table-cell;vertical-align:middle;opacity:0}.notyf__message{width:80%;position:relative;-webkit-animation:a .3s forwards;animation:a .3s forwards;-webkit-animation-delay:.15s;animation-delay:.15s}.notyf{position:fixed;bottom:20px;right:30px;width:20%;color:#fff;z-index:1}@media only screen and (max-width:736px){.notyf__container{width:90%;margin:0 auto;display:block;right:0;left:0}}        
 			        #content {
@@ -970,7 +975,7 @@ class TlenController extends BaseController {
 			</head>
 			<body>
 		<div id="app" style="padding-left:10px;padding-right:10px;"> 
-	 	<select name="table" v-model="selecttb"  @change="selecttable">
+	 	Select Table: <select class="selectpicker" name="table" v-model="selecttb"  @change="selecttable">
 	 	<option value="0">please -- select table --</option>
 		<?php
 	 	 foreach ($tables as $table) {
@@ -982,9 +987,10 @@ class TlenController extends BaseController {
 			<h2>Table: <b>{{selecttb}}</b></h2>
 			<br/><br/>
 			<div  id="content">
-				<input style="float:right" type="button" name="insert" value="New" @click="newitem()">
-				<table width="100%" border="0">
-					<thead><tr>
+
+				<input class="btn btn-primary" style="float:left" type="button" name="insert" value="New" @click="newitem()">
+				<table class="table table-striped table-hover" width="100%" >
+					<thead  class="thead-inverse" ><tr>
 						<th v-for="(col,idx) in columns" v-show="col.show" >{{col.field}}</th>
 					<th>Action</th></tr></thead>
 					<tbody>
@@ -997,9 +1003,9 @@ class TlenController extends BaseController {
 								<div v-if="col.type=='textarea'"><textarea  name="{{col.field}}" v-model="rows[col.field]"></textarea></div>
 								<div v-if="col.type=='text'"><input  type="text" name="{{col.field}}" v-model="rows[col.field]" /></div>
 							</td>
-							<td><div style="display:flex">
-								<input type="button" name="edit" value="save" @click="editrow(rows)">
-								<input type="button" name="del" value="del" @click="deleterow(rows)">
+							<td style="width:100px;"><div style="display:flex">
+								<input class="btn btn-warning btn-xs" type="button" name="edit" value="save" @click="editrow(rows)"> &nbsp;
+								<input class="btn btn-danger btn-xs" type="button" name="del" value="del" @click="deleterow(rows)">
 								</div>
 							</td>
 						</tr>
@@ -1130,9 +1136,13 @@ class TlenController extends BaseController {
 				beforeDestroy () { },
 				destroyed     () { },
 				})	
-			</script>
-			</body>
-			</html>
+		</script>
+		<!-- Add this after vue.js -->
+		<script src="//unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+		<script src="//unpkg.com/tether@latest/dist/js/tether.min.js"></script>
+		<script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+	</body>
+	</html>
 	<?php }
 
 	/**
