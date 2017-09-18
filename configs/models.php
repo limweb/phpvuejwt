@@ -20,9 +20,6 @@ class User  extends  Model  {
     protected $fillable = ['user','password','role_id'];
     // protected $guarded =  ['package'];
 
-    public function aaaa(){
-        return  'aaaa';
-    }
 
     public function __construct(array $attributes = []) {
         //$this->setRawAttributes(['expire_date' => Carbon::now()->addDays(7)],true);

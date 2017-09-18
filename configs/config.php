@@ -1,6 +1,6 @@
 <?php
 
-// FOR DEBUGING PHP
+// FOR DEBUGING PHP ---- start>
 ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 error_reporting(-1);
@@ -8,8 +8,11 @@ error_reporting(1);
 error_reporting(0);
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
-date_default_timezone_set('Asia/Bangkok');
+// FOR DEBUGING PHP ---- end.
 
+
+date_default_timezone_set('Asia/Bangkok');
+define('NONCE_SECRET', 'jvTGophIQ108Pqw9Hej'); // for nonce class
 define('DB_NAME'	, 'dbname');
 define('DB_USER'	, 'dbuser');
 define('DB_PASSWORD', 'dbpass');

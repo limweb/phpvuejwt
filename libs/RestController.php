@@ -1,6 +1,8 @@
 <?php
 namespace Jacwright\RestServer; 
 require_once __DIR__.'/../libs/DbTrait.php';
+require_once __DIR__.'/../libs/Nonce.php';
+require_once __DIR__.'/../libs/Csrf.php';
 
 class  RestController {
 

@@ -28,32 +28,33 @@ class SysController extends BaseController {
      * @url POST  /test/$id/$a/$b/$c      
      */
     public function postTest($id = null,$a=null,$b=null,$c=null) {
-        if($this->server->mode == 'debug'){
-            $o = new stdClass();
-            $o->hasRole = $this->rbac->hasRole('admin');
-            $o->rbac = $this->rbac;
-            $o->this = $this;
-            $o->url = $this->server->url;
-            $o->method = $this->server->method;
-            $o->params = $this->server->params;
-            $o->getStatus = $this->jwt->getStatus();
-            $o->getJwt = $this->jwt->getJwt();
-            $o->token = $this->jwt->getToken();
-            $o->getJwtobjdata = $this->jwt->getJwtobjdata();
-            $o->tokenverify = $this->jwt->tokenverify();
-            $o->chkauto = $this->jwt->chkauth();
-            $o->jwtrefreshobj = $this->jwt->jwtrefreshobj();
-            $o->data = 'tlen work';
-            $o->format = $this->server->format;
-            $o->status = 'success';
-            $o->id = $id;
-            $o->a = $a;
-            $o->b = $b;
-            $o->c = $c;
-            $o->gentokentest =  $this->jwt->token(json_decode('{"username":"","id":1,"role":"admin","level":"FF"}'));
-            // dump($this,$o);
-            return $o;
-        }
+        echo 'test';
+        // if($this->server->mode == 'debug'){
+        //     $o = new stdClass();
+        //     $o->hasRole = $this->rbac->hasRole('admin');
+        //     $o->rbac = $this->rbac;
+        //     $o->this = $this;
+        //     $o->url = $this->server->url;
+        //     $o->method = $this->server->method;
+        //     $o->params = $this->server->params;
+        //     $o->getStatus = $this->jwt->getStatus();
+        //     $o->getJwt = $this->jwt->getJwt();
+        //     $o->token = $this->jwt->getToken();
+        //     $o->getJwtobjdata = $this->jwt->getJwtobjdata();
+        //     $o->tokenverify = $this->jwt->tokenverify();
+        //     $o->chkauto = $this->jwt->chkauth();
+        //     $o->jwtrefreshobj = $this->jwt->jwtrefreshobj();
+        //     $o->data = 'tlen work';
+        //     $o->format = $this->server->format;
+        //     $o->status = 'success';
+        //     $o->id = $id;
+        //     $o->a = $a;
+        //     $o->b = $b;
+        //     $o->c = $c;
+        //     $o->gentokentest =  $this->jwt->token(json_decode('{"username":"","id":1,"role":"admin","level":"FF"}'));
+        //     // dump($this,$o);
+        //     return $o;
+        // }
     }
 
     /**
