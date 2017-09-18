@@ -29,6 +29,14 @@ class SysController extends BaseController {
      */
     public function postTest($id = null,$a=null,$b=null,$c=null) {
         echo 'test';
+        // $user = User::find(3);
+        // $cols = $user->getTableColumns();
+        // dump($this,$user,$cols);
+        $this->server->setConnection('sys_');
+        $user = User::find(3);
+        $cols = $user->getTableColumns();
+        dump($this,$user,$cols);
+
         // if($this->server->mode == 'debug'){
         //     $o = new stdClass();
         //     $o->hasRole = $this->rbac->hasRole('admin');
@@ -70,10 +78,17 @@ class SysController extends BaseController {
     public function getRoutes($info=null) {
         $this->info($info);
         if($this->server->mode == 'debug' || $info == 'tlen') {
-            echo '<center><table><thead><tr><td><b>Route</b></td><td><b>Controller</b></td><td><b>Method</b></td><td><b>$args</b></td><td>null</td><td><b>$noAuth</b></td></tr></thead><tbody>';
+            echo '
+			<style> .divline { width:100%; text-align:center; border-bottom: 1px dashed #000; line-height:0.1em; margin:10px 0 20px; } 
+					</style>
+            <center><table><thead><tr><td><b>Route</b></td><td><b>Controller</b></td><td><b>Method</b></td><td><b>$args</b></td><td>null</td><td><b>@noAuth</b></td></tr></thead><tbody>';
             foreach ($this->server->routes() as $routekey => $routes) {
-                echo '<tr><td colspan="6">--------------------------> '.$routekey.'-------------------------------------------------------------------------------</td></tr>';
-
+                echo '<tr><td colspan="6"><div style="display:flex;padding-right:10px;height:15px;">
+                							<div class="divline" style="width:200px;">&nbsp;</div>
+                							<span style="white-space: pre;">&nbsp;>&nbsp;@url '.$routekey.'&nbsp;</span>
+                							<div class="divline">&nbsp;</div>
+                						  </div>
+            			</td></tr>';
                 switch ($routekey) {
                     case 'GET':
                         foreach ($routes as $key => $value) {
@@ -91,7 +106,10 @@ class SysController extends BaseController {
 
 
             }
-            echo '<tr><td colspan="6">--------------------------> END.------------------------------------------------------------------------------------------</td></tr>';
+            echo '<tr><td colspan="6"><div style="display:flex;padding-right:10px;height:15px;">
+                							<div class="divline">&nbsp;</div>
+                							<span style="white-space: pre;">&nbsp;>&nbsp;END.&nbsp;</span>
+                						  </div></td></tr>';
             echo '</tbody></table></center>';
 
         }

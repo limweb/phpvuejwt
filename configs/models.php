@@ -2,15 +2,57 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+class BaseMobel extends Model  {
 
-class Package  extends  Model  { 
+        public static function boot()     {
+           parent::boot();
+           static::creating(function($model){
+               //dump('creating');
+           }); 
+           static::created(function($model){
+               //dump('created');
+           }); 
+           static::updating(function($model){
+               //dump('updating');
+           }); 
+           static::updated(function($model){
+               //dump('updated');
+           });
+           static::saving(function($model){
+               //dump('saving');
+           }); 
+           static::saved(function($model){
+               //dump('saved');
+           }); 
+           static::loaded(function($model){
+               //dump('load');
+           }); 
+        }
+        
+        public function newFromBuilder($attributes = array(),$connection = null) {
+           $instance = parent::newFromBuilder($attributes);
+           $instance->fireModelEvent('loaded');
+           return $instance;
+        }
+        public static function loaded($callback, $priority = 0)    {
+           static::registerModelEvent('loaded', $callback, $priority);
+        }
+
+        //--- public function in model want start getCapitalname---
+        public function getTableColumns() {
+            return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+        }
+}
+
+
+class Package  extends  BaseMobel  { 
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];    
     protected  $table='packages';
     protected  $primaryKey='id';
 }
 
-class User  extends  Model  { 
+class User  extends  BaseMobel  { 
     // use SoftDeletes;
     // use LoadTrait;
     // protected $dates = ['deleted_at'];
@@ -63,14 +105,18 @@ class User  extends  Model  {
         return $query->where('parent_id',0);
     }
 
-    //--- public function in model want start getCapitalname---
-    public function getTableColumns() {
-        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
-    }
 
+    public static function boot()     {
+        parent::boot();
+        static::loaded(function($model){
+            // dump('load');
+            $model->role;
+            $model->profile;
+        }); 
+    }
 }
 
-class Role  extends Model  {
+class Role  extends BaseMobel  {
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];
     protected  $table='roles';
@@ -84,76 +130,56 @@ class Role  extends Model  {
         return $this->hasMany('Role', 'parent_id', 'id');
     }
 
-    public function permissions(){
-        return $this->belongsToMany('Permission');
+    public function permission(){
+        return $this->hasMany('Permission');
     }
 
-        //--- public function in model want start getCapitalname---
-    public function getTableColumns() {
-        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
-    }
 }
 
-class permission_role extends Model {
+class permission_role extends BaseMobel {
     protected $table = 'permission_role';
 }
 
-class Syspackage extends Model {
+class Syspackage extends BaseMobel {
     protected $table = 'sys_packages';
 }
 
-class Permission  extends Model  {
+class Permission  extends BaseMobel  {
     protected  $table='permissions';
     protected  $primaryKey='id';
     public function module(){
         return $this->belongsTo('Module');
     }
-    //--- public function in model want start getCapitalname---
-    public function getTableColumns() {
-        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
-    }    
 }
 
-class Module  extends Model  {
+class Module  extends BaseMobel  {
     protected  $table='modules';
     protected  $primaryKey='id';
-    //--- public function in model want start getCapitalname---
-    public function getTableColumns() {
-        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
-    }    
+
+    public function scopePermission($query,$role_id) {
+        return Permission::where('role_id',$role_id)->where('module_id',$this->id)->first();
+    }
 }
 
-class Profile  extends Model  {
+class Profile  extends BaseMobel  {
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];
     protected  $table='profiles';
     protected  $primaryKey='id';
-    //--- public function in model want start getCapitalname---
-    public function getTableColumns() {
-        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
-    }
 }
 
-class Company  extends  Model  { 
+class Company  extends  BaseMobel  { 
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];
     protected  $table='companies';
     protected  $primaryKey='id';
-    //--- public function in model want start getCapitalname---
-    public function getTableColumns() {
-        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
-    }
 }
    
-class Dbcolinfo extends Model {
+class Dbcolinfo extends BaseMobel {
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];
     protected  $table='dbcolumninfos';
     protected  $primaryKey='id';
-    //--- public function in model want start getCapitalname---
-    public function getTableColumns() {
-        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
-    }    
 }     
 
 

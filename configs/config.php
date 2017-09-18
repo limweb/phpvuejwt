@@ -47,31 +47,39 @@ $config = [
 
 $capsule->addConnection($config,'default' );
 
+// Set the event dispatcher used by Eloquent models... (optional)
+use Illuminate\Events\Dispatcher;
+use Illuminate\Container\Container;
+$capsule->setEventDispatcher(new Dispatcher(new Container));
+
 // // Make this Capsule instance available globally via static methods... (optional)
 $capsule->setAsGlobal();
 
 // // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
 $capsule->bootEloquent();
 
-/**
- * @param prefix
- * @param dbname
- * @param host
- * @param username
- * @param password
- */ 
-function setConnection($prefix='',$dbname=null,$host=null,$username=null,$password=null) {
-	global $config;
-	$config['database'] = ( $dbname ?: DB_NAME );
-	$config['prefix'] = ( $prefix ?:'');
-	$config['host']	= ($host ?: DB_HOST);
-	$config['username']	= ($username ?: DB_USER);
-	$config['password']	= ($password ?: DB_PASSWORD);
-	$capsule = new Capsule;
-	$capsule->addConnection($config, 'default');
-	$capsule->bootEloquent();
-	// Capsule::setTablePrefix($prefix);
-	// echo Capsule::getTablePrefix();
-	// Capsule::setTablePrefix('sys_');
-	// echo Capsule::getTablePrefix();
+
+class Config {
+
+    protected $values;
+    
+    public function __construct($obj=null){
+        if($obj) {
+        	$this->values = $obj;
+        } else {
+        	$this->values = new \stdClass();
+        }
+
+    }
+
+    public function __get($prop) {
+        return (isset($this->values->$prop) ? $this->values->$prop : null  );
+    }
+
+    public function __set( $prop, $value ) {
+             $this->values->$prop = $value;
+    }
 }
+
+$sysconfig = new Config();
+$sysconfig->dbconfig = $config;

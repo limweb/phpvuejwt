@@ -26,30 +26,60 @@ class TlenController extends BaseController {
 		dump($companys);
 	}
 
+
+	/**
+	 *@noAuth
+	 *@url GET /listusers 
+	 */
+	public function listusers(){
+		$users = User::get();
+		echo '<ul>';
+		foreach ($users as $user) {
+			echo '<li><a href="/tlen/user/'.$user->id.'">'.$user->user.($user->profile?'/'.$user->profile->fname.' '.$user->profile->lname:null).'</a></li>';
+		}
+		echo '</ul>';
+	}
+
 	/**
 	 * @noAuth
 	 * @url GET /users
 	 */
 	public function users(){
 		$users = User::get();
-		echo '<table width="100%" border="1"><thead><tr><th>id</th><th>User</th><th>UUID</th><th>Package</th>
-			  <th>Role</th><th>Company</th><th>INFO</th><th>DEL</th>
-			  <th>Add sub User</th><th>Change Company</th><th>Add Company</th><th>add role</th>
-			  </tr></thead><tbody>';
+		echo '
+			  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.css" />	
+			  <table width="100%" border="1" class="table table-hover">
+			  <thead>
+			  	<tr>
+			  	<th style="white-space:nowrap;">id</th>
+			  	<th style="white-space:nowrap;">User</th>
+			  	<th style="white-space:nowrap;">UUID</th>
+			  	<th style="white-space:nowrap;">Package</th>
+			  	<th style="white-space:nowrap;">Role</th>
+			  	<th style="white-space:nowrap;">Company</th>
+			  	<th style="white-space:nowrap;">INFO</th>
+			  	<th style="white-space:nowrap;">DEL</th>
+			  	<th style="white-space:nowrap;">Add sub User</th>
+			  	<th style="white-space:nowrap;">Change Company</th>
+			  	<th style="white-space:nowrap;">Add Company</th>
+			  	<th style="white-space:nowrap;">add role</th>
+			  	</tr>
+			  </thead>
+			  <tbody>';
 		foreach ($users as  $user) {
 			if($user->default_select_comp) $user->company;
 			$user->role;
 			$user->package = Package::where('uuid',$user->uuid)->first();
 			$addcompany = '<form method="POST"  action="/tlen/addcompany/'.$user->id.'">';
 			$addcompany .= '<input type="text" name="companyname" value="">';
-			$addcompany .= '<input type="submit" name="submit" value="addcompany"></form>';
+			$addcompany .= '<input type="submit" class="btn-primary" name="submit" value="addcompany"></form>';
 			if($user->package->comp_db > 1) {
 				$companys = Company::where('comp_code',$user->uuid)->get();
 				$chkcompany = '<form method="POST"  action="/tlen/changecompany/'.$user->id.'"><select name="company"><option value="0">please select company</option>'; 
 				foreach ($companys as $company) {
 					$chkcompany .= '<option value="'.$company->id.'">'.$company->companyname.'</option>';
 				}
-				$chkcompany .='</select><input type="submit" name="submit" value="changecompany"></form>';
+				$chkcompany .='</select><input type="submit" class="btn-primary" name="submit" value="changecompany"></form>';
 			} else {
 				$chkcompany = '----no-----';
 			}
@@ -64,18 +94,18 @@ class TlenController extends BaseController {
 
 			echo '				
 			<tr>
-			<td>'.$user->id.'</td>
-			<td>'.$user->user.'</td>
-			<td>'.$user->uuid.'</td>
-			<td>'.$user->package->name.'</td>
-			<td>'.$user->role->role.'</td>
-			<td>'.(isset($user->company->companyname) ? $user->company->companyname : null).'</td>
-			<td><a href="/tlen/user/'.$user->id.'">'.$user->user.'</a></td>
-			<td  ><a href="/tlen/deluser/'.$user->id.'" onclick="return confirm(\'Are you sure?\');" >'.$user->user.'</a></td>
-			<td>'.(($user->package->account > $usercount && $user->role_id == 1 ) ? '<a href="/tlen/addsubuser/'.$user->id.'">'.$user->package->account.'/'.$usercount.'</a>' : $user->package->account.'/'.$usercount ).'</td>
-			<td>changcompany:'.$chkcompany.'</td>
-			<td>'.$user->package->comp_db.'/'.$companycount.':-->'.($companycount < $user->package->comp_db && $user->role_id == 1  ? $addcompany : "---no---" ).'</td>
-			<td>'.($user->role_id == 1 ? '<a href="/tlen/addrole/'.$user->id.'">Addrole</a>':'---no---').'</td>
+			<td style="white-space:nowrap;">'.$user->id.'</td>
+			<td style="white-space:nowrap;">'.$user->user.'</td>
+			<td style="white-space:nowrap;">'.$user->uuid.'</td>
+			<td style="white-space:nowrap;">'.$user->package->name.'</td>
+			<td style="white-space:nowrap;">'.$user->role->role.'</td>
+			<td style="white-space:nowrap;">'.(isset($user->company->companyname) ? $user->company->companyname : null).'</td>
+			<td style="white-space:nowrap;"><a href="/tlen/user/'.$user->id.'">'.$user->user.'</a></td>
+			<td style="white-space:nowrap;"><a href="/tlen/deluser/'.$user->id.'" onclick="return confirm(\'Are you sure?\');" >'.$user->user.'</a></td>
+			<td style="white-space:nowrap;">'.(($user->package->account > $usercount && $user->role_id == 1 ) ? '<a href="/tlen/addsubuser/'.$user->id.'">'.$user->package->account.'/'.$usercount.'</a>' : $user->package->account.'/'.$usercount ).'</td>
+			<td style="white-space:nowrap;">changcompany:'.$chkcompany.'</td>
+			<td style="white-space:nowrap;">'.$user->package->comp_db.'/'.$companycount.':-->'.($companycount < $user->package->comp_db && $user->role_id == 1  ? $addcompany : "---no---" ).'</td>
+			<td style="white-space:nowrap;">'.($user->role_id == 1 ? '<a href="/tlen/addrole/'.$user->id.'">Addrole</a>':'---no---').'</td>
 			</tr>';
 		}
 		echo '</tbody></table>';
@@ -1181,7 +1211,7 @@ class TlenController extends BaseController {
 				} else {
 					$chktype = $col->Type;
 				}
-				dump($chktype);
+				// dump($chktype);
 				if(in_array($chktype,$datetimetype)) {
 					$dbinfo->type = 'datetime';
 				} else if (in_array($chktype,$numbertype)){
@@ -1197,7 +1227,7 @@ class TlenController extends BaseController {
 						$dbinfo->type = 'text';
 					}
 				}
-				dump($dbinfo->type);
+				// dump($dbinfo->type);
 				$dbinfo->length = $chklength;
 				$dbinfo->json = json_encode($col,JSON_UNESCAPED_SLASHES);
 				$dbinfo->save();
@@ -1210,6 +1240,7 @@ class TlenController extends BaseController {
 		Dbcolinfo::where('field','created_at')->update(['show' => 0]);
 		Dbcolinfo::where('field','updated_at')->update(['show' => 0]);
 		Dbcolinfo::where('field','deleted_at')->update(['show' => 0]);
+		echo 'successed';
 	}
 
 	/**
@@ -1234,11 +1265,15 @@ class TlenController extends BaseController {
 		
 		switch ($this->server->method) {
 			case 'GET':
-				$roles = Role::get();
-				foreach ($roles as $role) {
-					$role->permission;
-				}
+				$roles = Role::where('comp_code','*********')->get();
 				$o->roles = $roles;
+				foreach ($o->roles as $role) {
+					$role->modules = Module::get();
+					foreach ($role->modules as $module) {
+						$module->permission = $module->permission($role->id);
+					}
+				}
+
 				break;
 			case 'POST':
 				# code...
@@ -1253,7 +1288,8 @@ class TlenController extends BaseController {
 				# code...
 				break;
 		}
-		return $o;
+		// return $o;
+		dump(json_decode(json_encode($o)));
 	}
 
 
