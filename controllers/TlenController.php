@@ -1,6 +1,6 @@
 <?php
-use \Jacwright\RestServer\RestException;
-use \Jacwright\RestServer\RestController as BaseController;
+use \Servit\RestServer\RestException;
+use \Servit\RestServer\RestController as BaseController;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class TlenController extends BaseController {
@@ -782,15 +782,14 @@ class TlenController extends BaseController {
 	 * @url GET  /test
 	 */
 	public function test(){
-		setConnection('sys_');
+		$this->server->setConnection('sys_');
 		$us = User::get();
-		// dump($us);
-		setConnection();
-		$us = User::isParent()->isSysadmin()->get();
+		dump($us);
+		$this->server->setConnection();
+		$us = User::get();
+		dump($us);
+		// $us = User::isParent()->isSysadmin()->get();
 		// dump($us->toArray());
-		$tableName = 'users';
-		$colName ='id';
-
 	}
 
 

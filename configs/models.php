@@ -1,58 +1,16 @@
 <?php
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Servit\Model\BaseModel;
 
-class BaseMobel extends Model  {
-
-        public static function boot()     {
-           parent::boot();
-           static::creating(function($model){
-               //dump('creating');
-           }); 
-           static::created(function($model){
-               //dump('created');
-           }); 
-           static::updating(function($model){
-               //dump('updating');
-           }); 
-           static::updated(function($model){
-               //dump('updated');
-           });
-           static::saving(function($model){
-               //dump('saving');
-           }); 
-           static::saved(function($model){
-               //dump('saved');
-           }); 
-           static::loaded(function($model){
-               //dump('load');
-           }); 
-        }
-        
-        public function newFromBuilder($attributes = array(),$connection = null) {
-           $instance = parent::newFromBuilder($attributes);
-           $instance->fireModelEvent('loaded');
-           return $instance;
-        }
-        public static function loaded($callback, $priority = 0)    {
-           static::registerModelEvent('loaded', $callback, $priority);
-        }
-
-        //--- public function in model want start getCapitalname---
-        public function getTableColumns() {
-            return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
-        }
-}
-
-
-class Package  extends  BaseMobel  { 
+class Package  extends  BaseModel  { 
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];    
     protected  $table='packages';
     protected  $primaryKey='id';
 }
 
-class User  extends  BaseMobel  { 
+class User  extends  BaseModel  { 
     // use SoftDeletes;
     // use LoadTrait;
     // protected $dates = ['deleted_at'];
@@ -116,7 +74,7 @@ class User  extends  BaseMobel  {
     }
 }
 
-class Role  extends BaseMobel  {
+class Role  extends BaseModel  {
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];
     protected  $table='roles';
@@ -136,15 +94,15 @@ class Role  extends BaseMobel  {
 
 }
 
-class permission_role extends BaseMobel {
+class permission_role extends BaseModel {
     protected $table = 'permission_role';
 }
 
-class Syspackage extends BaseMobel {
+class Syspackage extends BaseModel {
     protected $table = 'sys_packages';
 }
 
-class Permission  extends BaseMobel  {
+class Permission  extends BaseModel  {
     protected  $table='permissions';
     protected  $primaryKey='id';
     public function module(){
@@ -152,7 +110,7 @@ class Permission  extends BaseMobel  {
     }
 }
 
-class Module  extends BaseMobel  {
+class Module  extends BaseModel  {
     protected  $table='modules';
     protected  $primaryKey='id';
 
@@ -161,21 +119,21 @@ class Module  extends BaseMobel  {
     }
 }
 
-class Profile  extends BaseMobel  {
+class Profile  extends BaseModel  {
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];
     protected  $table='profiles';
     protected  $primaryKey='id';
 }
 
-class Company  extends  BaseMobel  { 
+class Company  extends  BaseModel  { 
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];
     protected  $table='companies';
     protected  $primaryKey='id';
 }
    
-class Dbcolinfo extends BaseMobel {
+class Dbcolinfo extends BaseModel {
     // use SoftDeletes;
     // protected $dates = ['deleted_at'];
     protected  $table='dbcolumninfos';

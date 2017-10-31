@@ -1,7 +1,7 @@
 <?php
 
-use \Jacwright\RestServer\RestException;
-use \Jacwright\RestServer\RestController as BaseController;
+use \Servit\RestServer\RestException;
+use \Servit\RestServer\RestController as BaseController;
 
 class TestController extends BaseController {
 

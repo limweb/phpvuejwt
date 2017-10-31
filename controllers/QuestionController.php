@@ -1,7 +1,7 @@
 <?php
-use \Jacwright\RestServer\RestException;
+use \Servit\RestServer\RestException;
 use Illuminate\Database\Capsule\Manager as Capsule; 
-use \Jacwright\RestServer\RestController as BaseController;
+use \Servit\RestServer\RestController as BaseController;
 
 class QuestionController extends BaseController {
 

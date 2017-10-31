@@ -27,14 +27,11 @@ define('CROS',true);
 define('EXPTIME', 60*60*24*30);  //  60sec * 60 mins * 24 hr * 30 day 
 define('SECRETKEY','02443f12-e1ef-11e5-b86d-9a79f06e9478');
 define('USEDROLE',true);
-define('REFTOKEN','ref_token');  // reference for  GET POST AJAX token field
-
 
 require_once  __DIR__.'/../vendor/autoload.php';
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model as Model;
 use Carbon\Carbon;
-use Servit\Cfg\Config;
 
 $capsule = new Capsule;
 $config = [
@@ -60,5 +57,29 @@ $capsule->setAsGlobal();
 
 // // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
 $capsule->bootEloquent();
+
+
+class Config {
+
+    protected $values;
+    
+    public function __construct($obj=null){
+        if($obj) {
+        	$this->values = $obj;
+        } else {
+        	$this->values = new \stdClass();
+        }
+
+    }
+
+    public function __get($prop) {
+        return (isset($this->values->$prop) ? $this->values->$prop : null  );
+    }
+
+    public function __set( $prop, $value ) {
+             $this->values->$prop = $value;
+    }
+}
+
 $sysconfig = new Config();
 $sysconfig->dbconfig = $config;

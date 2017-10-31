@@ -1,8 +1,15 @@
 {
+    "name": "servit/phpserver",
+	"minimum-stability": "dev",
+    "description": "My first Composer project",
+    "authors": [
+        {
+            "name": "Thongchai Lim",
+            "email": "thongchai@servit.co.th"
+        }
+    ],
     "require": {
-        "illuminate/database": "^5.5",
-        "illuminate/events": "^5.5",
-        "symfony/var-dumper": "^3.3",
-        "lcobucci/jwt": "^3.2"
+        "php": ">=5.5.0",
+		"servit/restsrv": "dev-master"
     }
 }

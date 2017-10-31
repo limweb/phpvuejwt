@@ -1,7 +1,7 @@
 <?php
 
-use \Jacwright\RestServer\RestException;
-use \Jacwright\RestServer\RestController as BaseController;
+use \Servit\RestServer\RestException;
+use \Servit\RestServer\RestController as BaseController;
 
 
 class SysController extends BaseController {
@@ -74,8 +74,12 @@ class SysController extends BaseController {
 
     /**
      * @noAuth
+     * @url GET /routes
+     * @url GET /routes/$info
+     * @url GET /routes/$info/$controller
      */
-    public function getRoutes($info=null) {
+    public function getRoutes($info=null,$controller=null) {
+        dump($this,$info,$controller);
         $this->info($info);
         if($this->server->mode == 'debug' || $info == 'tlen') {
             echo '
@@ -92,14 +96,26 @@ class SysController extends BaseController {
                 switch ($routekey) {
                     case 'GET':
                         foreach ($routes as $key => $value) {
+                            if($controller){
+                                if($value[0]==$controller){
                             echo "<tr><td>".($routekey =='GET' ? '<a href="http://'.$_SERVER['HTTP_HOST'].'/'.$key.'">'.( empty($key) ? '/' : $key ).'</a>'    : $key)."</td><td>$value[0]</td><td>$value[1]</td><td><pre>".json_encode($value[2])."</pre></td><td>".json_encode($value[3])."</td><td>".json_encode($value[4])."</td></tr>";
+                        }
+                            } else {
+                                echo "<tr><td>".($routekey =='GET' ? '<a href="http://'.$_SERVER['HTTP_HOST'].'/'.$key.'">'.( empty($key) ? '/' : $key ).'</a>'    : $key)."</td><td>$value[0]</td><td>$value[1]</td><td><pre>".json_encode($value[2])."</pre></td><td>".json_encode($value[3])."</td><td>".json_encode($value[4])."</td></tr>";
+                            }
                         }
                         break;
                     case 'POST':
                     case 'OPTIONS':
                     default:
                         foreach ($routes as $key => $value) {
+                            if($controller){
+                               if($value[0] == $controller){
                             echo "<tr><td style='cursor:pointer;' onclick='alert(\"".$key."\")'>$key</td><td>$value[0]</td><td>$value[1]</td><td><pre>".json_encode($value[2])."</pre></td><td>".json_encode($value[3])."</td><td>".json_encode($value[4])."</td></tr>";
+                        }
+                            } else {
+                                echo "<tr><td style='cursor:pointer;' onclick='alert(\"".$key."\")'>$key</td><td>$value[0]</td><td>$value[1]</td><td><pre>".json_encode($value[2])."</pre></td><td>".json_encode($value[3])."</td><td>".json_encode($value[4])."</td></tr>";
+                            }
                         }
                         break;
                 }
@@ -148,7 +164,7 @@ class SysController extends BaseController {
      */
     public function home() {
         // $this->info();
-        // require __DIR__.'/../home/magic.html';
+        // echo '<center>';require __DIR__.'/../home/magic.html'; echo '</center>';
         // require __DIR__.'/../page/app.php';
         require __DIR__.'/../index.html';
         exit(0);

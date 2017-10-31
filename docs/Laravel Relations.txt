@@ -1,14 +1,59 @@
 One To One(hasOne,belongsTo)
 DB: user(id,name) -----  address(id,user_id,address1,country)
 
+class User  extends  Model  { 
+        protected  $table='user';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function address(){
+        	return $this->hasOne('Address');
+        }
+}
+
+class Address  extends  Model  { 
+		
+        protected  $table='addresses';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function user(){
+        	return $this->belongsTo('User')
+        }
+}
+
 user hasOne address
 -------------------------->
 <--------------------------
 address belongsTo user
 
 
+
+
+
+
 One To Many(hasMany,belongsTo)
 DB: user(id,name) ----> posts(id,user_id,post)
+
+class User  extends  Model  { 
+        protected  $table='user';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function posts(){
+        	return $this->hasMay('Post');
+        }
+}
+
+class Post  extends  Model  { 
+        protected  $table='posts';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function user(){
+        	return $this->belongsTo('User');
+        }
+}
 
 user hasMany post
 -------------------------->
@@ -16,8 +61,32 @@ user hasMany post
 post belongsTo user
 
 
+
+
 Many To Many(belongsToMany)
 DB: posts(id,name) ---> post_tag(post_id,tag_id) <----- tags(id,name)
+class Post  extends  Model  { 
+        protected  $table='posts';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function tags(){
+        	return $this->belongsToMany('Tag');
+        }
+}
+
+class Tag  extends  Model  { 
+		
+        protected  $table='tags';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function posts(){
+        	return $this->belongsToMany('Post')
+        }
+}
+
+
 
 post belongsToMany tag
 -------------------------->
@@ -25,11 +94,57 @@ table post_tag( post_id,tag_id)
 <--------------------------
 tag  belongsToMany post
 
+$tag->posts()->attach([1,2,3]); //attach insert
+$tag->posts()->detach([1,2,3]); //detach delete
 
-Has Many Through(hasManyThrough)
+
+
+
+One to Many Through/Has Many Through(hasManyThrough)
 DB: counties(id,name)->users(id,country_id,name)->posts(id,user_id,post)
 
 country------>hasManyThrough----->posts
+class Country  extends  Model  { 
+        protected  $table='countries';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function users(){
+        	return $this->hasMany('User');
+        }
+
+        public function posts(){
+        	return $this->hasManyThrough('Post','User');
+        }
+
+
+}
+
+class User  extends  Model  { 
+        protected  $table='user';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function Posts(){
+        	return $this->hasMany('Post');
+        }
+
+        public function country(){
+        	return $this->belongsTo('Country')
+        }
+
+}
+
+class Post  extends  Model  { 
+        protected  $table='posts';
+        protected  $primaryKey='id';
+        public $timestamps = true;
+
+        public function user(){
+        	return $this->belongsTo("User");
+        }
+
+}
 
 
 
