@@ -79,8 +79,8 @@ class SysController extends BaseController {
      * @url GET /routes/$info/$controller
      */
     public function getRoutes($info=null,$controller=null) {
-        dump($this,$info,$controller);
-        $this->info($info);
+        // dump($this,$info,$controller);
+        // $this->info($info);
         if($this->server->mode == 'debug' || $info == 'tlen') {
             echo '
 			<style> .divline { width:100%; text-align:center; border-bottom: 1px dashed #000; line-height:0.1em; margin:10px 0 20px; } 
