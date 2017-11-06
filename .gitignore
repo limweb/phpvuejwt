@@ -9,6 +9,7 @@
 /.idea
 /.vagrant
 sftp-config.json
+composer.lock
 Homestead.json
 Homestead.yaml
 npm-debug.log

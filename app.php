@@ -1,4 +1,5 @@
 <?php 
+(session_status() == PHP_SESSION_NONE ? session_start() : null ); 
 require_once __DIR__.'/vendor/autoload.php'; // Autoload files using Composer autoload
 require_once __DIR__.'/configs/config.php';
 require_once __DIR__.'/configs/models.php';

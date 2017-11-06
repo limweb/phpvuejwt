@@ -1,7 +1,7 @@
 <?php
 use \Servit\RestServer\RestException;
 use \Servit\RestServer\RestController as BaseController;
-use \Servit\Libs\DbTrait;
+use \Servit\Traits\DbTrait;
 
 class RoleController extends BaseController {
 

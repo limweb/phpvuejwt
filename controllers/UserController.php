@@ -1,9 +1,10 @@
 <?php
-use \Servit\RestServer\RestException;
-use \Servit\RestServer\RestController as BaseController;
-use \Servit\Libs\DbTrait;
+use Servit\RestServer\RestException;
+use Servit\RestServer\RestController as BaseController;
+use Servit\Traits\DbTrait;
 
-class UserController extends BaseController {
+
+class UserController extends BaseController  {
 
 	use DbTrait;  // if use DbTrait please add prefix 
 

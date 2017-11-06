@@ -640,12 +640,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/limweb/restsrv.git",
-                "reference": "9344ec02993200d11c056c43b928e7c6a19603b3"
+                "reference": "eb8edf5a0c371248921f93ad4cced23248d83e3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limweb/restsrv/zipball/9344ec02993200d11c056c43b928e7c6a19603b3",
-                "reference": "9344ec02993200d11c056c43b928e7c6a19603b3",
+                "url": "https://api.github.com/repos/limweb/restsrv/zipball/eb8edf5a0c371248921f93ad4cced23248d83e3b",
+                "reference": "eb8edf5a0c371248921f93ad4cced23248d83e3b",
                 "shasum": ""
             },
             "require": {
@@ -672,7 +672,7 @@
                 }
             ],
             "description": "My first Composer project",
-            "time": "2017-10-31T18:56:48+00:00"
+            "time": "2017-11-06T16:35:02+00:00"
         },
         {
             "name": "setasign/fpdi",
@@ -788,12 +788,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "e7bfada027b7c17e973c80f5f789f91f896e42f8"
+                "reference": "7f7a9a29817e938fd397372d6d5a44031789c79c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/e7bfada027b7c17e973c80f5f789f91f896e42f8",
-                "reference": "e7bfada027b7c17e973c80f5f789f91f896e42f8",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/7f7a9a29817e938fd397372d6d5a44031789c79c",
+                "reference": "7f7a9a29817e938fd397372d6d5a44031789c79c",
                 "shasum": ""
             },
             "require": {
@@ -848,7 +848,7 @@
             ],
             "description": "Symfony Translation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-10-24T14:12:06+00:00"
+            "time": "2017-11-05T16:10:10+00:00"
         },
         {
             "name": "symfony/var-dumper",
