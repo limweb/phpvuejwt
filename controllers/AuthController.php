@@ -96,8 +96,9 @@ class  AuthController extends BaseController {
 		 * @noAuth
 		*/
 		public function postLogin() {
-			$user = $this->server->data->username;
-			$pass = $this->server->data->password;
+			$user = $this->input->posts->username;
+			$pass = $this->input->posts->password;
+			// dump($user,$pass,$this); exit();
 			$username = '';
 			if($user == 'admin') { $username=$user; $role = 'admin';  $level = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
 			if($user == 'staff') { $username=$user; $role = 'staff';  $level = 'FAFFFFFFFFFFFFFFFFFFFFFFFFFFF'; }
@@ -129,7 +130,7 @@ class  AuthController extends BaseController {
                         'jwt'=> $this->server->token,
                         ];
                     } else {
-				// $this->server->handleError(404);
+						// $this->server->handleError(404);
                     	throw new RestException(401, "You are not authorized to access this resource.");
                     }
                 }

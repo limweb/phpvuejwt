@@ -640,12 +640,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/limweb/restsrv.git",
-                "reference": "eb8edf5a0c371248921f93ad4cced23248d83e3b"
+                "reference": "7c844267e62627705aae172e81ba14641b643322"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limweb/restsrv/zipball/eb8edf5a0c371248921f93ad4cced23248d83e3b",
-                "reference": "eb8edf5a0c371248921f93ad4cced23248d83e3b",
+                "url": "https://api.github.com/repos/limweb/restsrv/zipball/7c844267e62627705aae172e81ba14641b643322",
+                "reference": "7c844267e62627705aae172e81ba14641b643322",
                 "shasum": ""
             },
             "require": {
@@ -672,7 +672,7 @@
                 }
             ],
             "description": "My first Composer project",
-            "time": "2017-11-06T16:35:02+00:00"
+            "time": "2017-11-06T17:20:28+00:00"
         },
         {
             "name": "setasign/fpdi",

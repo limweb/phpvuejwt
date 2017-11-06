@@ -1,4 +1,42 @@
 <?php
+
+   //************************************************************************
+   //* Class fileInfo: stores a file's information
+   //************************************************************************
+
+   class FileInfo {
+      var $name, $path, $fullname, $isDir, $lastmod, $owner,
+      $perms, $size, $isLink, $linkTo, $extension;
+
+      public function permissions($mode) {
+         $perms  = ($mode & 00400) ? "r" : "-";
+         $perms .= ($mode & 00200) ? "w" : "-";
+         $perms .= ($mode & 00100) ? "x" : "-";
+         $perms .= ($mode & 00040) ? "r" : "-";
+         $perms .= ($mode & 00020) ? "w" : "-";
+         $perms .= ($mode & 00010) ? "x" : "-";
+         $perms .= ($mode & 00004) ? "r" : "-";
+         $perms .= ($mode & 00002) ? "w" : "-";
+         $perms .= ($mode & 00001) ? "x" : "-";
+         return $perms;
+      }
+
+      public function getInfo($file) {                 // Stores a file's information in the class variables
+         $this->name = basename($file);
+         $this->path = dirname($file);
+         $this->fullname = $file;
+         $this->isDir = is_dir($file);
+         $this->lastmod = date("m/d/y, H:i", filemtime($file));
+         $this->owner = fileowner($file);
+         $this->perms = $this->permissions(fileperms($file));
+         $this->size = filesize($file);
+         $this->isLink = is_link($file);
+         if ($this->isLink) $this->linkTo = readlink($file);
+         $buffer = explode(".", $this->fullname);
+         $this->extension = $buffer[sizeof($buffer)-1];      
+      }
+   };
+
 // require_once __DIR__.'/vendor/autoload.php';
 setlocale(LC_CTYPE, 'th_TH.utf8');
 error_reporting(0);
@@ -44,15 +82,15 @@ header("content-type: text/html; charset=UTF-8");
 
 
    // $default_directory = dirname($PATH_TRANSLATED);   
-   $default_directory = __DIR__;
+   $default_directory = SRVPATH;
    $dir = filter_input(INPUT_GET,'dir');
    $dir = ($dir?:$default_directory);
-   $dir = ($dir =='/'? __DIR__: $dir);
+   $dir = ($dir =='/'? SRVPATH: $dir);
    if ($OS_UNIX) {
    	$USERNAME = `whoami`;
    }
 
-   $fileInfo = new fileInfo;        // This will hold a file's information all over the script   
+   $fileInfo = new FileInfo;        // This will hold a file's information all over the script   
    $show_icons= true;
    $PHP_SELF = $_SERVER['PHP_SELF'];
  
@@ -127,44 +165,6 @@ header("content-type: text/html; charset=UTF-8");
    if (isset($show_footer) && $show_footer = true) printHTMLFooter();
    
    exit;
-
-   //************************************************************************
-   //* Class fileInfo: stores a file's information
-   //************************************************************************
-
-   class fileInfo {
-      var $name, $path, $fullname, $isDir, $lastmod, $owner,
-      $perms, $size, $isLink, $linkTo, $extension;
-
-      function permissions($mode) {
-         $perms  = ($mode & 00400) ? "r" : "-";
-         $perms .= ($mode & 00200) ? "w" : "-";
-         $perms .= ($mode & 00100) ? "x" : "-";
-         $perms .= ($mode & 00040) ? "r" : "-";
-         $perms .= ($mode & 00020) ? "w" : "-";
-         $perms .= ($mode & 00010) ? "x" : "-";
-         $perms .= ($mode & 00004) ? "r" : "-";
-         $perms .= ($mode & 00002) ? "w" : "-";
-         $perms .= ($mode & 00001) ? "x" : "-";
-         return $perms;
-      }
-
-      function getInfo($file) {                 // Stores a file's information in the class variables
-         $this->name = basename($file);
-         $this->path = dirname($file);
-         $this->fullname = $file;
-         $this->isDir = is_dir($file);
-         $this->lastmod = date("m/d/y, H:i", filemtime($file));
-         $this->owner = fileowner($file);
-         $this->perms = $this->permissions(fileperms($file));
-         $this->size = filesize($file);
-         $this->isLink = is_link($file);
-         if ($this->isLink) $this->linkTo = readlink($file);
-         $buffer = explode(".", $this->fullname);
-         $this->extension = $buffer[sizeof($buffer)-1];      
-      }
-   };
-
 
 ///////////////////////////////     HTML STYLE     ///////////////////////////////
 
@@ -338,8 +338,9 @@ header("content-type: text/html; charset=UTF-8");
 
 <?php 
       for ($i = 0; $i < sizeof($directories); $i++) {
-
+         dump($directories[$i]);
          $fileInfo->getInfo($directories[$i]);
+         dump($fileInfo);
          showFileInfo($fileInfo);
       }
 

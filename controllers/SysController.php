@@ -4,6 +4,7 @@ use \Servit\RestServer\RestException;
 use \Servit\RestServer\RestController as BaseController;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Servit\Libs\Request;
+use Servit\Libs\Mysqltunnel;
 
 class SysController extends BaseController {
 
@@ -30,6 +31,8 @@ class SysController extends BaseController {
      */
     public function postTest($id = null,$a=null,$b=null,$c=null) {
         echo 'test';
+        $this->input->test = 'xxxxx';
+        $this->input->user = 'aaaa';
         dump($this);
         // $user = User::find(3);
         // $cols = $user->getTableColumns();
@@ -188,9 +191,28 @@ class SysController extends BaseController {
      *@url POST /testmysql
      */ 
     public function mysql() {
-        consolelog($_GET,$_POST);
-        require_once __DIR__.'/../libs/ntunnel_mysql.php';
-        // echo 'mysql',__DIR__;
+        // consolelog($this->input->getdata());
+        $mysql = new Mysqltunnel();
+        echo $mysql;
+    }
+
+
+    /**
+     *@noAuth
+     *@url GET  /myadmin
+     *@url POST /myadmin
+     */ 
+    public function myadmin(){
+        require_once __DIR__.'/../page/mysqladmin.php';
+    }    
+
+    /**
+     *@noAuth
+     *@url GET  /explorer
+     *@url POST /explorer
+     */ 
+    public function phpexplorer(){
+        require_once __DIR__.'/../page/phpexplorer.php';
     }
 
 }
