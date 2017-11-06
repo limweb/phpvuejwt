@@ -28,6 +28,8 @@ define('EXPTIME', 60*60*24*30);  //  60sec * 60 mins * 24 hr * 30 day
 define('SECRETKEY','02443f12-e1ef-11e5-b86d-9a79f06e9478');
 define('USEDROLE',true);
 define('REFTOKEN','ref_token');  // reference for  GET POST AJAX token field
+define('AUTHTYPE','session');  // session // jwt default jwt 
+define('PERPAGE','10');  // display number rows perpage
 
 
 require_once  __DIR__.'/../vendor/autoload.php';

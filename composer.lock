@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "5c44a7fd5cc739c498ca242338b58978",
+    "content-hash": "aee42ad0c5af780d3d8516955082fadc",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -640,12 +640,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/limweb/restsrv.git",
-                "reference": "3693c0d6ccb4d641b7db5e01c43542e39892cd52"
+                "reference": "9344ec02993200d11c056c43b928e7c6a19603b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/limweb/restsrv/zipball/3693c0d6ccb4d641b7db5e01c43542e39892cd52",
-                "reference": "3693c0d6ccb4d641b7db5e01c43542e39892cd52",
+                "url": "https://api.github.com/repos/limweb/restsrv/zipball/9344ec02993200d11c056c43b928e7c6a19603b3",
+                "reference": "9344ec02993200d11c056c43b928e7c6a19603b3",
                 "shasum": ""
             },
             "require": {
@@ -664,6 +664,7 @@
                     "Servit": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "authors": [
                 {
                     "name": "Thongchai Lim",
@@ -671,11 +672,7 @@
                 }
             ],
             "description": "My first Composer project",
-            "support": {
-                "source": "https://github.com/limweb/restsrv/tree/master",
-                "issues": "https://github.com/limweb/restsrv/issues"
-            },
-            "time": "2017-10-31T06:00:49+00:00"
+            "time": "2017-10-31T18:56:48+00:00"
         },
         {
             "name": "setasign/fpdi",

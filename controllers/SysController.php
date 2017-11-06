@@ -2,7 +2,8 @@
 
 use \Servit\RestServer\RestException;
 use \Servit\RestServer\RestController as BaseController;
-
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Servit\Libs\Request;
 
 class SysController extends BaseController {
 
@@ -29,13 +30,14 @@ class SysController extends BaseController {
      */
     public function postTest($id = null,$a=null,$b=null,$c=null) {
         echo 'test';
+        dump($this);
         // $user = User::find(3);
         // $cols = $user->getTableColumns();
         // dump($this,$user,$cols);
-        $this->server->setConnection('sys_');
-        $user = User::find(3);
-        $cols = $user->getTableColumns();
-        dump($this,$user,$cols);
+        // $this->server->setConnection('sys_');
+        // $user = User::find(3);
+        // $cols = $user->getTableColumns();
+        // dump($this,$user,$cols);
 
         // if($this->server->mode == 'debug'){
         //     $o = new stdClass();
@@ -79,8 +81,8 @@ class SysController extends BaseController {
      * @url GET /routes/$info/$controller
      */
     public function getRoutes($info=null,$controller=null) {
-        dump($this,$info,$controller);
-        $this->info($info);
+        // dump($this,$info,$controller);
+        // $this->info($info);
         if($this->server->mode == 'debug' || $info == 'tlen') {
             echo '
 			<style> .divline { width:100%; text-align:center; border-bottom: 1px dashed #000; line-height:0.1em; margin:10px 0 20px; } 
@@ -96,8 +98,8 @@ class SysController extends BaseController {
                 switch ($routekey) {
                     case 'GET':
                         foreach ($routes as $key => $value) {
-                            if($controller){
-                                if($value[0]==$controller){
+                            if($info == 'tlen' && $controller){
+                                if(strtolower($value[0])==strtolower($controller)){
                             echo "<tr><td>".($routekey =='GET' ? '<a href="http://'.$_SERVER['HTTP_HOST'].'/'.$key.'">'.( empty($key) ? '/' : $key ).'</a>'    : $key)."</td><td>$value[0]</td><td>$value[1]</td><td><pre>".json_encode($value[2])."</pre></td><td>".json_encode($value[3])."</td><td>".json_encode($value[4])."</td></tr>";
                         }
                             } else {
@@ -109,8 +111,8 @@ class SysController extends BaseController {
                     case 'OPTIONS':
                     default:
                         foreach ($routes as $key => $value) {
-                            if($controller){
-                               if($value[0] == $controller){
+                            if($info == 'tlen' && $controller){
+                               if(strtolower($value[0])==strtolower($controller)){
                             echo "<tr><td style='cursor:pointer;' onclick='alert(\"".$key."\")'>$key</td><td>$value[0]</td><td>$value[1]</td><td><pre>".json_encode($value[2])."</pre></td><td>".json_encode($value[3])."</td><td>".json_encode($value[4])."</td></tr>";
                         }
                             } else {
@@ -178,4 +180,17 @@ class SysController extends BaseController {
     public function throwError() {
         throw new RestException(401, "Empty password not allowed");
     }
+
+
+    /**
+     *@noAuth
+     *@url GET /testmysql
+     *@url POST /testmysql
+     */ 
+    public function mysql() {
+        consolelog($_GET,$_POST);
+        require_once __DIR__.'/../libs/ntunnel_mysql.php';
+        // echo 'mysql',__DIR__;
+    }
+
 }

@@ -2,6 +2,7 @@
 use \Servit\RestServer\RestException;
 use \Servit\RestServer\RestController as BaseController;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer;
