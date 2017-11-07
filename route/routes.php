@@ -9,3 +9,4 @@ $server->addClass('TController','/t'); // fortest
 $server->addClass('AppController','/api/v1'); // fortest
 $server->addClass('TlenController','/tlen'); // fortest
 $server->addClass('JwtController',''); // fortest
+$server->addClass('AdminlteController','/admin'); // fortest
