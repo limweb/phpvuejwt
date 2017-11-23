@@ -13,7 +13,6 @@ use \Curl\Curl;
 
 class JwtController extends BaseController {
 
-
 	/**
 	 *@noAuth
 	 *@url POST  /jwt/register

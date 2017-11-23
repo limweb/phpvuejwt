@@ -96,7 +96,7 @@
      user experience. -->
  </div><!-- app -->
 <?php 
-	if($this->server->url == 'admin'){
+	if(isset($this->server) && $this->server->url == 'admin'){
 		echo '<script src="/page/themes/'.$this->theme.'/script/index.js" type="text/javascript" charset="utf-8"></script>';
 	} else {
 		echo '<script src="/page/themes/'.$this->theme.'/script/index.js" type="text/javascript" charset="utf-8"></script>';

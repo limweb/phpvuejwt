@@ -4,10 +4,8 @@ use \Servit\RestServer\RestException;
 use \Servit\RestServer\RestController as BaseController;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Servit\Libs\Request;
-use Servit\Libs\Mysqltunnel;
 
 class SysController extends BaseController {
-
 
     // public function getChkauth(){
     //     if($this->server->mode == 'debug'){
@@ -30,10 +28,12 @@ class SysController extends BaseController {
      * @url POST  /test/$id/$a/$b/$c      
      */
     public function postTest($id = null,$a=null,$b=null,$c=null) {
-        echo 'test';
-        $this->input->test = 'xxxxx';
-        $this->input->user = 'aaaa';
-        dump($this);
+
+        // echo 'test';
+        // $this->input->test = 'xxxxx';
+        // $this->input->user = 'aaaa';
+        // dump($this);
+        require_once $this->server->serverpath.'/page/themes/web/index.php';
         // $user = User::find(3);
         // $cols = $user->getTableColumns();
         // dump($this,$user,$cols);
@@ -171,7 +171,7 @@ class SysController extends BaseController {
         // $this->info();
         // echo '<center>';require __DIR__.'/../home/magic.html'; echo '</center>';
         // require __DIR__.'/../page/app.php';
-        require __DIR__.'/../index.html';
+        require $this->server->serverpath.'/page/themes/web/index.php';
         exit(0);
     }
 
@@ -183,19 +183,6 @@ class SysController extends BaseController {
     public function throwError() {
         throw new RestException(401, "Empty password not allowed");
     }
-
-
-    /**
-     *@noAuth
-     *@url GET /testmysql
-     *@url POST /testmysql
-     */ 
-    public function mysql() {
-        // consolelog($this->input->getdata());
-        $mysql = new Mysqltunnel();
-        echo $mysql;
-    }
-
 
     /**
      *@noAuth
